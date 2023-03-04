@@ -9,7 +9,7 @@
   } from "carbon-components-svelte";
 
   export let disabled = true;
-  import { newProject } from "$lib/stores.js";
+  import { newProject } from "$lib/stores.ts";
 
   const stationParameters = [
     "Temperature",

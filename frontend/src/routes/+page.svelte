@@ -17,12 +17,18 @@
   } from "carbon-components-svelte";
 
   import CreateProject from "$lib/composites/CreateProject.svelte";
-  import {newProject} from "$lib/stores.js";
+  import {newProject} from "$lib/stores.ts";
 
   let isSideNavOpen = false;
+  
 
   let open = [false, false];
   let disabled = [true, true];
+
+  const closeCreateModal = () => {
+	open[0] = false;
+	newProject.reset();
+  };
 </script>
 
 <Header company="Precio" platformName="Dashboard" bind:isSideNavOpen>
@@ -45,7 +51,7 @@
 <Fab text="+">
   <Button on:click={
 	() => {
-	  open[0] = !open[0];
+	  open[0] = true;
 	}
   }>Create Project</Button>
   <Button>Import Project</Button>
@@ -59,10 +65,10 @@
   secondaryButtonText="Cancel"
   selectorPrimaryFocus="#CreateName"
   hasScrollingContent
-  onRequestClose={() => (open = false)}
-  onRequestSubmit={() => (open = false)}
+  onRequestClose={closeCreateModal}
+  onRequestSubmit={closeCreateModal}
   primaryButtonDisabled={disabled[0]}
-  on:click:button--secondary={() => (open = false)}
+  on:click:button--secondary={closeCreateModal}
   on:submit={() =>{
 	console.log(JSON.stringify($newProject));
   }}
