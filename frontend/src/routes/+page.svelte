@@ -1,8 +1,9 @@
 <script>
   import Fab from "$lib/components/Fab.svelte";
-  import "@fontsource/open-sans";
   import "carbon-components-svelte/css/g100.css";
-  import SidenavComposite from "../lib/composites/Sidenav.svelte";
+  
+  import SidenavComposite from "$lib/composites/Sidenav.svelte";
+
   import {
     Header,
     SkipToContent,
@@ -15,7 +16,8 @@
     Button,
   } from "carbon-components-svelte";
 
-  import CreateProject from "../lib/composites/CreateProject.svelte";
+  import CreateProject from "$lib/composites/CreateProject.svelte";
+  import {newProject} from "$lib/stores.js";
 
   let isSideNavOpen = false;
 
@@ -61,6 +63,10 @@
   onRequestSubmit={() => (open = false)}
   primaryButtonDisabled={disabled[0]}
   on:click:button--secondary={() => (open = false)}
+  on:submit={() =>{
+	console.log(JSON.stringify($newProject));
+  }}
+
 
 >
  <CreateProject bind:disabled={disabled[0]} />

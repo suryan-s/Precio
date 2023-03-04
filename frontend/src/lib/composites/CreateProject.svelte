@@ -9,15 +9,7 @@
   } from "carbon-components-svelte";
 
   export let disabled = true;
-
-
-  let data = {
-    name: "",
-    type: "Arable",
-    available: "",
-    stationParameters: [],
-    pmsParameters: [],
-  };
+  import { newProject } from "$lib/stores.js";
 
   const stationParameters = [
     "Temperature",
@@ -30,14 +22,14 @@
     "Battery Status",
   ];
   const pmsParameters = ["Soil Moisture", "Soil Temperature/Humidity"];
-  $: console.log(data);
+  $: console.log(JSON.stringify($newProject));
   $: if (
-    data.name.trim() === "" ||
-    data.type.trim() === "" ||
-    data.available.trim() === "" ||
-    [...data.stationParameters, ...data.pmsParameters].length === 0||
-	["Organic", "Horticulture", "Aquaponics", "Vertical Farming"].includes(data.type)||
-	["Actuators"].includes(data.available)
+    $newProject.name.trim() === "" ||
+    $newProject.type.trim() === "" ||
+    $newProject.available.trim() === "" ||
+    [...$newProject.stationParameters, ...$newProject.pmsParameters].length === 0||
+	["Organic", "Horticulture", "Aquaponics", "Vertical Farming"].includes($newProject.type)||
+	["Actuators"].includes($newProject.available)
   ) {
 	disabled = true;
   } else {
@@ -50,12 +42,12 @@
   invalidText="A valid value is required"
   labelText="Project Name"
   placeholder="A Cool Project"
-  bind:value={data.name}
+  bind:value={$newProject.name}
 />
 <br />
 <Select
   labelText="Project Type"
-  on:change={(e) => (data.type = e.target.value)}
+  on:change={(e) => ($newProject.type = e.target.value)}
 >
   <SelectItem value="Arable" />
   <SelectItem value="Hydroponics" />
@@ -72,33 +64,33 @@
 <RadioButtonGroup
   name="radio-button-group"
   value="Weather Station"
-  bind:selected={data.available}
+  bind:selected={$newProject.available}
 >
   <RadioButton value="Weather Station" labelText="Weather Station" />
   <RadioButton value="PMS" labelText="PMS" />
   <RadioButton value="Actuators" labelText="Actuators" />
 </RadioButtonGroup>
 <br />
-{#if data.available === "Weather Station"}
+{#if $newProject.available === "Weather Station"}
   <!-- loop over station stationParameters -->
   <p class="bx--label">Select the parameters you want to track</p>
   <div style="display:flex; flex-wrap: wrap;">
     {#each stationParameters as parameter}
       <Checkbox
-        bind:group={data.stationParameters}
+        bind:group={$newProject.stationParameters}
         labelText={parameter}
         value={parameter}
       />
     {/each}
   </div>
 {/if}
-{#if data.available === "PMS"}
+{#if $newProject.available === "PMS"}
   <!-- loop over pmsParameters -->
   <p class="bx--label">Select the parameters you want to track</p>
   <div style="display:flex; flex-wrap: wrap;">
     {#each pmsParameters as parameter}
       <Checkbox
-        bind:group={data.pmsParameters}
+        bind:group={$newProject.pmsParameters}
         labelText={parameter}
         value={parameter}
       />
