@@ -18,6 +18,7 @@
 
   import CreateProject from "$lib/composites/CreateProject.svelte";
   import {newProject} from "$lib/stores.ts";
+  import { text } from "svelte/internal";
 
   let isSideNavOpen = false;
   
@@ -70,7 +71,17 @@
   primaryButtonDisabled={disabled[0]}
   on:click:button--secondary={closeCreateModal}
   on:submit={() =>{
-	console.log(JSON.stringify($newProject));
+	fetch('/api/createProject', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify($newProject)
+	})
+	.then(response => response.text())
+	.then(text => {
+		console.log(text);
+	})
   }}
 
 
