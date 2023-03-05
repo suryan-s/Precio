@@ -45,14 +45,15 @@ export const newProject : Writable<Project> = createNewProject();
 export function fetchStore (url:string) {
 	const loading = writable(false)
 	const error = writable(false)
-	const data = writable([[]])
+	const data = writable<string[][]>([[]])
 	
 	async function get() {
 		loading.set(true)
 		error.set(false)
 		try {
-			const response = await fetch(url)
-			data.set(await response.json())
+			const response = await fetch(url).then(r => r.json())
+			data.set(JSON.parse(response[0]))
+			console.log(response[0])
 		} catch(e) {
 			error.set(e)
 		}
@@ -63,3 +64,4 @@ export function fetchStore (url:string) {
 	
 	return [ data, loading, error, get]
 }
+
