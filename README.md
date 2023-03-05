@@ -159,7 +159,7 @@ Precio offers the following features:
 - [ ] ML model for predicting plant health and advanced predictions
 - [ ] Support for Horticulture, Aquaponics, Vertical farming
 
-# Contribution and Guidelines
+## Contribution and Guidelines
 
 To start contributing to the project, clone the repository into your local system subdirectory using the below git code:
 
@@ -200,3 +200,6 @@ Push all of your updated work into this GitHub repo in the form of a Pull Reques
 ```
   git push origin main
 ```
+</br>
+
+<hr/>
