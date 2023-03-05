@@ -82,9 +82,9 @@ async def update_pms(api_token : str, request : Request):
 async def get_table():
     return get_table_names()    
 
-@app.get("/api/getLineGraph/{api_token}")
-def get_graph(api_token : str):
-    return get_line_data(api_token)
+@app.get("/api/getLineGraph/{api_token}/{graph}")
+def get_graph(api_token : str, graph : int):
+    return get_line_data(api_token, graph)
 
 @app.get("/api/getGauge/{api_token}")
 def get_gauge(api_token : str):

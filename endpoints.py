@@ -179,20 +179,13 @@ def insert_into_table_WMS(datapoints,token):
             return status
         
 def get_gauge_data(token):
-    get_data_sql = '''SELECT date_time, 
-        maxtempC, 
-        mintempC, 
-        uvIndex, 
-        DewPointC, 
-        FeelsLikeC, 
+    get_data_sql = '''SELECT date_time,  
+        uvIndex,  
         HeatIndexC, 
-        WindChillC, 
-        WindGustKmph, 
         humidity, 
         precipMM, 
         pressure, 
         tempC,         
-        winddirDegree, 
         windspeedKmph FROM {} ORDER BY date_time DESC LIMIT 1;'''.format(token)
     conn = sqlite3.connect(os.path.join('database','sql3.db'))
     status = 0
@@ -204,10 +197,10 @@ def get_gauge_data(token):
         rows = c.fetchall()
         # print(rows[0])
         parameters = [
-            'date_time','maxtempC','mintempC','uvIndex',
-            'DewPointC','FeelsLikeC','HeatIndexC','WindChillC',
-            'WindGustKmph','humidity','precipMM','pressure',
-            'tempC','winddirDegree','windspeedKmph'
+            'date_time','uvIndex',
+            'HeatIndexC',
+            'humidity','precipMM','pressure',
+            'tempC','windspeedKmph'
         ] 
             
         for row,parameter in zip(list(rows[0]),parameters):
@@ -225,16 +218,24 @@ def get_gauge_data(token):
             conn.close()
             return result,status
         
-def get_line_data(token):
-    get_data_sql = '''SELECT date_time, 
-        maxtempC, 
-        mintempC,
-        WindGustKmph, 
-        humidity, 
-        precipMM, 
-        pressure, 
-        tempC,    
-        windspeedKmph FROM {} ORDER BY date_time DESC LIMIT 20;'''.format(token)
+def get_line_data(token, parameter):
+    get_data_sql = ''''''
+    if parameter ==0:
+        get_data_sql = '''SELECT date_time, 
+            maxtempC, 
+            mintempC,
+            tempC,    
+            FROM {} ORDER BY date_time DESC LIMIT 50;'''.format(token)
+    elif parameter ==1:
+        get_data_sql = '''SELECT date_time, 
+            humidity FROM {} ORDER BY date_time DESC LIMIT 50;'''.format(token)
+    elif parameter ==2:
+        get_data_sql = '''SELECT date_time, 
+            precipMM FROM {} ORDER BY date_time DESC LIMIT 50;'''.format(token)
+    elif parameter ==3:
+        get_data_sql = '''SELECT date_time, 
+            pressure FROM {} ORDER BY date_time DESC LIMIT 50;'''.format(token)
+    
     conn = sqlite3.connect(os.path.join('database','sql3.db'))
     status = 0
     result = None
