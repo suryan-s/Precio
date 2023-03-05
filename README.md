@@ -1,6 +1,6 @@
 # Introduction
 ## Purpose
-Precio is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.
+Precio is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations by incorporating precision farming practices. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.
 ## Scope
 This document covers the installation, usage, and features of Precio.
 ## Audience
