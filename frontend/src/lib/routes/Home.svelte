@@ -41,7 +41,7 @@ let open = [false, false];
   <Grid>
     <Row>
       <Column>
-        <h1>Precio Dashboard</h1>
+        <img src="./precio.png" style="width:100%;max-width:400px;text-align:center;" alt="logo" />
       </Column>
 	 </Row>
 	 {#if $data}

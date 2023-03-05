@@ -11,18 +11,9 @@
 </script>
 
 
-<SideNav bind:isOpen={isSideNavOpen}>
-    <SideNavItems>
-      <SideNavLink text="Link 1" />
-      <SideNavLink text="Link 2" />
-      <SideNavLink text="Link 3" />
-      <SideNavMenu text="Menu">
-        <SideNavMenuItem href="/" text="Link 1" />
-        <SideNavMenuItem href="/" text="Link 2" />
-        <SideNavMenuItem href="/" text="Link 3" />
-      </SideNavMenu>
-      <SideNavDivider />
-      <SideNavLink text="Link 4" />
-    </SideNavItems>
+<SideNav bind:isOpen={isSideNavOpen} style="padding:1rem;">
+  <p>
+    <a href="https://github.com/suryan-s/precio">Precio</a> is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations by incorporating precision farming practices. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.
+
+  </p>
   </SideNav>
-  
