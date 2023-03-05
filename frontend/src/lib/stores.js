@@ -1,15 +1,7 @@
 //stores
-import { Writable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 import {customAlphabet} from "nanoid";
 
-interface Project {
-	id: string;
-	name: string;
-	type: string;
-	available: string;
-	stationParameters: string[];
-	pmsParameters: string[];
-}
 
 function createNewProject() {
 	const { subscribe, set, update } = writable({
@@ -40,12 +32,12 @@ function createNewProject() {
 
 export const isSideNavOpen = writable(false);
 
-export const newProject : Writable<Project> = createNewProject();
+export const newProject = createNewProject();
 
-export function fetchStore (url:string) {
+export function fetchStore (url) {
 	const loading = writable(false)
 	const error = writable(false)
-	const data = writable<string[][]>([[]])
+	const data = writable([[]])
 	
 	async function get() {
 		loading.set(true)

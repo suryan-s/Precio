@@ -1,43 +1,39 @@
 <script>
-  import Fab from "$lib/components/Fab.svelte";
+      import Fab from "../components/Fab.svelte";
 
 
-  import {
+import {
 
-    Content,
-    Grid,
-    Row,
-    Column,
-    Modal,
-    TextInput,
-    Button,
-	Tile,
-  } from "carbon-components-svelte";
-  import SidenavComposite from "$lib/composites/Sidenav.svelte";
+  Content,
+  Grid,
+  Row,
+  Column,
+  Modal,
+  TextInput,
+  Button,
+  Tile,
+} from "carbon-components-svelte";
+import SidenavComposite from "../composites/Sidenav.svelte";
 
-  import CreateProject from "$lib/composites/CreateProject.svelte";
-  import {newProject,fetchStore} from "$lib/stores.ts";
-  import { text } from "svelte/internal";
-  import {isSideNavOpen} from "$lib/stores.ts";
- 
-  
-
-  let open = [false, false];
+import CreateProject from "../composites/CreateProject.svelte";
+import {newProject,fetchStore} from "../stores.js";
+import { text } from "svelte/internal";
+import {isSideNavOpen} from "../stores.js";
+let open = [false, false];
   let disabled = [true, true];
   let deleteOpen = false;
-  let deleteEl = ""
-
+  let deleteEl = "";
+  
   const closeCreateModal = () => {
 	open[0] = false;
 	newProject.reset();
   };
 
 
+
   const [data,loadng, error, get] = fetchStore('http://127.0.0.1:8000/api/getTableNames');
 
-
 </script>
-
 
 <SidenavComposite bind:isSideNavOpen = {$isSideNavOpen} />
 
@@ -59,7 +55,7 @@
 			<p>Status : <span style="color:green">Active</span></p>
 			</div>
 			<div>
-			<Button kind="primary" href="/project/{projectName}">View</Button>
+			<Button kind="primary" href="#/{projectName}">View</Button>
 			<Button kind="danger" on:click={()=>{
 				deleteOpen = true;
 				deleteEl = projectName[0];
@@ -130,15 +126,3 @@ on:submit={() => {
 	  <p>Are you sure you want to delete this project?</p>
 </Modal>
 
-
-<style>
-  :global(*) {
-    box-sizing: border-box;
-  }
-  :global(body) {
-    margin: 0;
-    padding: 0;
-	font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-    width: 100%;
-  }
-</style>

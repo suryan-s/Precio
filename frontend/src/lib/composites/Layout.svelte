@@ -7,7 +7,7 @@
     import {    Header,
     SkipToContent,} from "carbon-components-svelte";
 
-    import {isSideNavOpen} from "$lib/stores.ts";
+    import {isSideNavOpen} from "../stores.js";
     onMount(async() => {
         document.documentElement.setAttribute('theme', 'g100');
     });
