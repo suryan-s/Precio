@@ -224,7 +224,7 @@ def get_line_data(token, parameter):
         get_data_sql = '''SELECT date_time, 
             maxtempC, 
             mintempC,
-            tempC,    
+            tempC    
             FROM {} ORDER BY date_time DESC LIMIT 50;'''.format(token)
     elif parameter ==1:
         get_data_sql = '''SELECT date_time, 
