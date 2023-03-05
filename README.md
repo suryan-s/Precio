@@ -1,3 +1,6 @@
+![banner](https://user-images.githubusercontent.com/76394506/222950283-fcc97ccc-d39b-4c47-a2cb-87569b960b44.png)
+
+
 # Introduction
 ## Purpose
 Precio is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations by incorporating precision farming practices. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.
