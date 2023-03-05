@@ -1,4 +1,6 @@
-![banner](https://user-images.githubusercontent.com/76394506/222950283-fcc97ccc-d39b-4c47-a2cb-87569b960b44.png)
+
+![Banner](https://user-images.githubusercontent.com/76394506/222956195-0dd600ca-100d-4cc1-b79d-4ea2d10b4304.png)
+
 
 <p align='center'>
     <h1><strong>PRECIO</strong></h1>
