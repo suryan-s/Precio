@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from endpoints import *
 
@@ -12,6 +13,14 @@ mimetypes.add_type('text/css', '.css')
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.mount("/static/", StaticFiles(directory="./frontend/build", html=True), name="static")
 
 # @app.get("/", response_class=HTMLResponse)

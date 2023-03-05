@@ -1,11 +1,16 @@
 <script>
-      import "carbon-components-svelte/css/g100.css";
-  
+    import "@carbon/styles/css/styles.css";
+    import "carbon-components-svelte/css/g100.css";
+ import "@carbon/charts/styles.css";
+ import {onMount} from "svelte";
+
     import {    Header,
     SkipToContent,} from "carbon-components-svelte";
 
     import {isSideNavOpen} from "$lib/stores.ts";
-
+    onMount(async() => {
+        document.documentElement.setAttribute('theme', 'g100');
+    });
 </script>
 
 <Header company="Precio" platformName="Dashboard" bind:isSideNavOpen = {$isSideNavOpen}>
