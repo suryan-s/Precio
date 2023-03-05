@@ -3,6 +3,14 @@ import json
 import os
 import sqlite3
 
+import numpy as np
+import pandas as pd
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+# from tensorflow.keras.layers import Dense
+# from tensorflow.keras.models import Sequential
+
 # {     
 #     "id":"string"," 
 #     "name":"Agro",
@@ -101,12 +109,13 @@ def delete_project(token):
     finally:
         if conn:
             conn.close()
+            # print(status)
             return status
         
 # create_project("24k3423","weather")
 #garden_ZBFZCz9Ugn
 
-def insert_into_table(datapoints,token):
+def insert_into_table_WMS(datapoints,token):
     db_name = ""
     tb_name = "" 
     with open('settings.json', 'r') as f:
@@ -197,7 +206,7 @@ def get_gauge_data(token):
         ] 
             
         for row,parameter in zip(rows,parameters):
-            data[str(row)] = parameter
+            data[row] = parameter
             
         conn.commit()
         status =200
@@ -213,18 +222,12 @@ def get_gauge_data(token):
 def get_line_data(token):
     get_data_sql = '''SELECT date_time, 
         maxtempC, 
-        mintempC, 
-        uvIndex, 
-        DewPointC, 
-        FeelsLikeC, 
-        HeatIndexC, 
-        WindChillC, 
+        mintempC,
         WindGustKmph, 
         humidity, 
         precipMM, 
         pressure, 
         tempC,    
-        winddirDegree,
         windspeedKmph FROM {} ORDER BY date_time DESC LIMIT 20;'''.format(token)
     conn = sqlite3.connect(os.path.join('database','sql3.db'))
     status = 0
@@ -264,7 +267,32 @@ def get_table_names():
             conn.close()
             return result,status
         
+def insert_into_table_PMS(token, datapoints):
+    tempC = datapoints['tempC']
+    moisture = datapoints['moisture']
+    location = datapoints['location']
+    pms_insert = '''INSERT into {} (tempC, moisture, location) VALUES ('{}','{}','{}')';'''.format(token,tempC,moisture,location)
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    status = 0
+    result = None
+    c = conn.cursor() 
+    try:          
+        c.execute(pms_insert)
+        rows = c.fetchall()  
+        result = json.dumps(rows)          
+        conn.commit()
+        status =200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            conn.close()
+            return result,status
         
+        
+def predictBasic():
+    pass
 # print(get_line_data('Garden_B5gWZiq83M'))
 # print(get_table_names())
 # print(delete_project('Farmland_OBVL0EJnB0'))

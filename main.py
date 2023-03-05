@@ -41,22 +41,32 @@ async def create_table(request : Request):
     status = create_project(incoming)
     return {"status": status}
 
-@app.post("/api/deleteProject/{api_token}")
-async def delete_project(api_token : str, request : Request):
+@app.get("/api/deleteProject/{api_token}")
+async def deleteProject(api_token : str):
     # incoming = await request.json()
     # incoming = json.dumps(incoming)
     # incoming = json.loads(incoming)
-    status = delete_project(api_token) # type: ignore 
+    status = delete_project(api_token) 
     return {"status": status}
 
-@app.post("/api/update/{api_token}")
-async def update_table(api_token : str, request : Request):
+@app.post("/api/WMS/{api_token}")
+async def update_wms(api_token : str, request : Request):
     incoming = await request.json()
     incoming = json.dumps(incoming)
     incoming = json.loads(incoming)
     print(incoming)
     print(api_token)
-    status = insert_into_table(incoming, api_token)
+    status = insert_into_table_WMS(incoming, api_token)
+    return {"status": status}
+
+@app.post("/api/PMS/{api_token}")
+async def update_pms(api_token : str, request : Request):
+    incoming = await request.json()
+    incoming = json.dumps(incoming)
+    incoming = json.loads(incoming)
+    print(incoming)
+    print(api_token)
+    status = insert_into_table_PMS(incoming, api_token)
     return {"status": status}
     
 @app.get("/api/getTableNames")
@@ -70,3 +80,6 @@ def get_graph(api_token : str):
 @app.get("/api/getGauge/{api_token}")
 def get_gauge(api_token : str):
     return get_gauge_data(api_token)
+@app.get("/api/predict/basic")
+def predict_basic():
+    return predictBasic()
