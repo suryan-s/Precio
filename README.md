@@ -1,73 +1,200 @@
 ![banner](https://user-images.githubusercontent.com/76394506/222950283-fcc97ccc-d39b-4c47-a2cb-87569b960b44.png)
 
-# **PRECIO**
+<p align='center'>
+    <h1><strong>PRECIO</strong></h1>
+</p>
 
-Precio is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.                                        The software is available under the MIT License.
+Precio is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.                                 The software is available under the MIT License.
 
 ## Purpose
 
 Precio is an open-source software tool for monitoring and visualizing farming data. It provides real-time data analysis and insights of farming, enabling informed decision-making and improving farming efficiency. Precio includes third-party integration and is designed to be user-friendly, optimizing resource usage, reducing waste, and increasing productivity.
 
-## Scope
-
-This document covers the installation, usage, and features of Precio.
-
 ## Audience
 
-This document is intended for developers and users of Precio.
+This application is intended for any agricultural enthusiast and developers looking forward for contributing into precision farming applications.
 
-# Installation
+</br>
+<hr/>
 
-# Files and Folders
+## Installation and Usage
 
-There are certain resources and settings within the application that are not intended to be edited outside of the application's designated settings or interface. These resources and settings are considered critical to the proper functioning of the application and should only be edited by authorized personnel using the designated tools and interfaces.
+- Clone the repository :\
+  `git clone [https://github.com/suryan-s/Precio](https://github.com/suryan-s/Precio)`
+- Run setup.py in the main directory to create virtual environment, install packages from requirements.txt and build the static files for the frontend:\
+  `python setup.py`
+- Run application by:\
+  `uvicorn main:app --port 8000 --host 0.0.0.0`
+</br>
 
-For more information on the application's directory structure and how to handle merge conflicts among other files, please refer to the README file in the application's GitHub repository. The README file provides detailed instructions on how to manage the application's resources and files.
+<hr/>
 
-It is important to note that certain subdirectories within the application's directory structure are critical to the proper functioning of the application. These subdirectories are described in detail in the README file, along with instructions on how to manage them. Any changes made to these critical subdirectories should be made with caution and only by authorized personnel with the necessary expertise.
+## Files and Folders
 
-- Arduino:
-- Database: All datas are stored in sqllite
-- Frontend: It is created using svelte
-    - Src: It includes all control & component files of the application
+```
 
-# Usage
+Precio
+├─ .git
+├─ .gitignore
+├─ .vscode
+│  └─ settings.json
+├─ arduino
+│  ├─ PMS.ino
+│  ├─ Weather Monitoring Station
+│  │  ├─ WMS-GERBER-img.jpg
+│  │  ├─ WMS-GERBER-PDF.pdf
+│  │  ├─ WMS-GERBER-PNG.png
+│  │  └─ WMS-GERBER.zip
+│  └─ WMS.ino
+├─ database
+│  └─ .gitkeep
+├─ endpoints.py
+├─ frontend
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ public
+│  │  └─ vite.svg
+│  ├─ README.md
+│  ├─ src
+│  │  ├─ App.svelte
+│  │  ├─ assets
+│  │  │  └─ svelte.svg
+│  │  ├─ lib
+│  │  │  ├─ components
+│  │  │  │  ├─ Button.svelte
+│  │  │  │  ├─ Fab.svelte
+│  │  │  │  ├─ Modal.svelte
+│  │  │  │  └─ Sidebar.svelte
+│  │  │  ├─ composites
+│  │  │  │  ├─ CreateProject.svelte
+│  │  │  │  ├─ Layout.svelte
+│  │  │  │  └─ Sidenav.svelte
+│  │  │  ├─ routes
+│  │  │  │  ├─ dashboard.svelte
+│  │  │  │  ├─ Home.svelte
+│  │  │  │  └─ routes.js
+│  │  │  └─ stores.js
+│  │  ├─ main.js
+│  │  └─ vite-env.d.ts
+│  ├─ svelte.config.js
+│  └─ vite.config.js
+├─ index.html
+├─ LICENSE
+├─ main.py
+├─ model
+│  └─ best_pretemp.h5
+├─ requirements.txt
+├─ settings.json
+├─ setup.py
+└─ _README.md
 
-- Clone the repository : git clone [https://github.com/suryan-s/Precio](https://github.com/suryan-s/Precio)
-- Run by: `uvicorn main:app --port 8000 --host 0.0.0.0`
+```
 
-## Accessing Precio
+</br>
 
-Once installed, users can access Precio through a web interface.
+<hr/>
 
-## Monitoring and Visualization
+## Requirements
 
-Precio offers real-time monitoring and visualization of critical data to help farmers make informed decisions.
+- Python 3.8.5 or higher
+- Arduino IDE
+- Node.js 16.15.4 or higher
+- Libraries used:
+  - Python: numpy, pandas, tensorflow, keras, uvicorn, fastapi, scikit-learn
+  - Svelte, vite, svelte-spa-router
+  - IBM Carbon Design System
+  - NanoID
+- Optional requirements:
+  - Hardware support for PMS(Plant Monitoring System) and WMS(Weather Monitoring Station)
+</br>
 
-## Integration
+<hr/>
 
-The project supports arable and hydroponic farming practices and offers easy integration with third-party tools and devices.
-
-# Features
+## Integration and Features
 
 Precio offers the following features:
 
-- Real-time monitoring of critical data such as temperature, humidity, and crop growth
-- Intuitive visualization features for better data analysis
-- Easy integration with third-party tools and devices
-- User-friendly interface for streamlined operations
-- Support for both arable and hydroponic farming practices
+- Real-time monitoring of critical data required for the governance of farming operations.
+- Intuitive visualization features for better data analysis and insights.
+- Easy integration with third-party tools and devices.
+- User-friendly interface for streamlined operations and reduced resource usage.
+- Support for following farming practices for greater flexibility:
+  - Arable farming
+  - Hydroponic farming
+  - Horticulture
+  - Aquaponics
+  - Vertical farming
+- Support for actuators and actions for improved efficiency with Telegram integration:
+  - Water pumps
+  - Water heaters
+  - Lights
+  - Sprinklers
+  - Irrigation systems
+  - Ventilation systems
+  - CO2 sensors
+  - Temperature sensors
+  - Humidity sensors
+  - pH sensors
+  - Water level sensors
+  - Water flow sensors
+  - Water quality sensors etc.
+</br>
 
-# Conclusion
+<hr/>
 
-## Summary
+## Current Status
 
-Precio is a powerful tool for modern farmers seeking greater efficiency, productivity, and sustainability in their operations. With its intuitive features, easy integration, and user-friendly interface, Precio is the ideal solution for farmers seeking to optimize their agricultural operations.
+- [x] Create project and organise projects.
+- [x] Support for Arable farming.
+- [x] Visualization dashboard.
+- [x] Integration with Arduino with hardware and software support for WMS.
+- [x] Dockerized application.
 
 ## Future Developments
 
-Future developments for Precio will include additional features and functionality, as well as improved integration with third-party tools and devices.
+- [ ] Integration with Arduino with hardware and software support for PMS.
+- [ ] Telegram integration for actuators and actions.
+- [ ] ML model for predicting plant health and advanced predictions
+- [ ] Support for Horticulture, Aquaponics, Vertical farming
 
-## Support
+# Contribution and Guidelines
 
-For technical support, please refer to the support guide located in the project repository.
+To start contributing to the project, clone the repository into your local system subdirectory using the below git code:
+
+```
+https://github.com/suryan-s/Precio.git
+```
+
+Before cloning the repository, make sure to navigate to the working subdirectory of your command line interface and ensure that no folder with same name exists. Other ways to clone the repository includes using a password protected SSH key, or by using [Git CLI](https://cli.github.com/). The changes may additionally be performed by opening this repo using [GitHub Desktop](https://desktop.github.com/)
+
+## Submitting a Pull Request
+
+Before opening a Pull Request, it is recommended to have a look at the full contributing page to make sure your code complies with all the pull request guidelines.
+
+Navigate to this subdirectory, & check status of all files that were altered (red) by running the below code in Git Bash:
+
+```
+  git status
+```
+
+Stage all your files that are to be pushed into your pull request. This can be done in two ways - stage all or some files:
+
+```
+  git add .            // adds every single file that shows up red when running git status
+```
+
+```
+  git add <filename>   // type in the particular file that you would like to add to the PR
+```
+
+Commit all the changes that you've made and describe in brief the changes that you have made using this command:
+
+```
+  git commit -m "<commit_message>"
+```
+
+Push all of your updated work into this GitHub repo in the form of a Pull Request by running the following command:
+
+```
+  git push origin main
+```
