@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static/", StaticFiles(directory="./frontend/build", html=True), name="static")
+app.mount("/static/", StaticFiles(directory="./frontend/dist", html=True), name="static")
 
 # @app.get("/", response_class=HTMLResponse)
 # async def read_index():
