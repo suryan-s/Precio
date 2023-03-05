@@ -1,10 +1,7 @@
-import json
-import sqlite3
-import os
-import time
 import datetime
-import glob
-
+import json
+import os
+import sqlite3
 
 # {     
 #     "id":"string"," 
@@ -19,7 +16,6 @@ def get_client(input):
     incoming_json = json.dumps(input)
     incoming_json  = json.loads(incoming_json)
     print(incoming_json)
-    print(incoming_json['location'])
     
 def create_project(config):
     status =500
@@ -90,21 +86,33 @@ def create_project(config):
     conn.close()
     return status
     
-def delete_table(token):
-    db_name = os.path.join('database','{}.db'.format(token))
-    if os.path.exists(db_name):
-        os.remove(db_name)
-        print("Database deleted successfully.")
+def delete_project(token):
+    delete_sql = '''DROP TABLE {};'''.format(token)
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    status = 0
+    c = conn.cursor() 
+    try:          
+        c.execute(delete_sql)
+        conn.commit()
+        status =200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            conn.close()
+            return status
         
 # create_project("24k3423","weather")
+#garden_ZBFZCz9Ugn
 
-def insert_into_table(datapoints):
+def insert_into_table(datapoints,token):
     db_name = ""
-    tb_name = ""
+    tb_name = "" 
     with open('settings.json', 'r') as f:
         data = json.load(f)
-        db_name = data['database']
-        tb_name = data['table_name']
+        # db_name = data['database']
+    tb_name = token
     date_time = datetime.datetime.now()
     maxtempC = datapoints['maxtempC']
     mintempC = datapoints['mintempC']
@@ -141,8 +149,8 @@ def insert_into_table(datapoints):
         winddirDegree, 
         windspeedKmph, 
         location
-        ) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');'''.format(tb_name,location, date_time, maxtempC, mintempC, uvIndex, DewPointC, FeelsLikeC, HeatIndexC, WindChillC, WindGustKmph, humidity, precipMM, pressure, tempC, visibility, winddirDegree, windspeedKmphL, location)
-    conn = sqlite3.connect(db_name)
+        ) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');'''.format(tb_name, date_time, maxtempC, mintempC, uvIndex, DewPointC, FeelsLikeC, HeatIndexC, WindChillC, WindGustKmph, humidity, precipMM, pressure, tempC, visibility, winddirDegree, windspeedKmphL, location)
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
     status = 0
     c = conn.cursor() 
     try:          
@@ -156,3 +164,108 @@ def insert_into_table(datapoints):
         if conn:
             conn.close()
             return status
+        
+def get_gauge_data(token):
+    get_data_sql = '''SELECT date_time, 
+        maxtempC, 
+        mintempC, 
+        uvIndex, 
+        DewPointC, 
+        FeelsLikeC, 
+        HeatIndexC, 
+        WindChillC, 
+        WindGustKmph, 
+        humidity, 
+        precipMM, 
+        pressure, 
+        tempC,         
+        winddirDegree, 
+        windspeedKmph FROM {} ORDER BY date_time DESC LIMIT 1;'''.format(token)
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    status = 0
+    c = conn.cursor() 
+    data = {}
+    result = None
+    try:          
+        c.execute(get_data_sql)
+        rows = c.fetchall()
+        parameters = [
+            'date_time','maxtempC','mintempC','uvIndex',
+            'DewPointC','FeelsLikeC','HeatIndexC','WindChillC',
+            'WindGustKmph','humidity','precipMM','pressure',
+            'tempC','winddirDegree','windspeedKmph'
+        ] 
+            
+        for row,parameter in zip(rows,parameters):
+            data[str(row)] = parameter
+            
+        conn.commit()
+        status =200
+        result = json.dumps(data)
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            conn.close()
+            return result,status
+        
+def get_line_data(token):
+    get_data_sql = '''SELECT date_time, 
+        maxtempC, 
+        mintempC, 
+        uvIndex, 
+        DewPointC, 
+        FeelsLikeC, 
+        HeatIndexC, 
+        WindChillC, 
+        WindGustKmph, 
+        humidity, 
+        precipMM, 
+        pressure, 
+        tempC,    
+        winddirDegree,
+        windspeedKmph FROM {} ORDER BY date_time DESC LIMIT 20;'''.format(token)
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    status = 0
+    result = None
+    c = conn.cursor() 
+    try:          
+        c.execute(get_data_sql)
+        rows = c.fetchall()  
+        result = json.dumps(rows)          
+        conn.commit()
+        status =200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            conn.close()
+            return result,status
+        
+def get_table_names():
+    table_names = '''SELECT name FROM sqlite_master WHERE type='table';'''
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    status = 0
+    result = None
+    c = conn.cursor() 
+    try:          
+        c.execute(table_names)
+        rows = c.fetchall()  
+        result = json.dumps(rows)          
+        conn.commit()
+        status =200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            conn.close()
+            return result,status
+        
+        
+# print(get_line_data('Garden_B5gWZiq83M'))
+# print(get_table_names())
+# print(delete_project('Farmland_OBVL0EJnB0'))
+# print(get_gauge_data('Garden_B5gWZiq83M'))

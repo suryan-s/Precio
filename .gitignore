@@ -128,3 +128,4 @@ dmypy.json
 .pyre/
 /.hintrc
 /test.py
+/database/sql3.db
