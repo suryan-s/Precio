@@ -8,6 +8,9 @@ This document is intended for developers and users of Precio.
 # Installation
 
 # Usage
+ - Clone the repository
+ - Run by:
+    ```uvicorn main:app --port 8000 --host 0.0.0.0```
 ## Accessing Precio
 Once installed, users can access Precio through a web interface.
 ## Monitoring and Visualization
