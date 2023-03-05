@@ -142,6 +142,8 @@ Precio offers the following features:
   - Water quality sensors etc.
 </br>
 
+- IoT integration could be implemented by connecting to localhost/api/WMS/{api_token} or localhost/api/PMS/{api_token}
+
 <hr/>
 
 ## Current Status
