@@ -16,7 +16,6 @@
     "vite": "^4.0.0"
   },
   "dependencies": {
-    "@fontsource/open-sans": "^4.5.14",
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "nanoid": "^4.0.1",
     "svelte-spa-router": "^3.3.0",
