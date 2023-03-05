@@ -1,12 +1,9 @@
 <script>
   import Fab from "$lib/components/Fab.svelte";
-  import "carbon-components-svelte/css/g100.css";
-  
-  import SidenavComposite from "$lib/composites/Sidenav.svelte";
+
 
   import {
-    Header,
-    SkipToContent,
+
     Content,
     Grid,
     Row,
@@ -14,13 +11,15 @@
     Modal,
     TextInput,
     Button,
+	Tile,
   } from "carbon-components-svelte";
+  import SidenavComposite from "$lib/composites/Sidenav.svelte";
 
   import CreateProject from "$lib/composites/CreateProject.svelte";
-  import {newProject} from "$lib/stores.ts";
+  import {newProject,fetchStore} from "$lib/stores.ts";
   import { text } from "svelte/internal";
-
-  let isSideNavOpen = false;
+  import {isSideNavOpen} from "$lib/stores.ts";
+ 
   
 
   let open = [false, false];
@@ -30,22 +29,42 @@
 	open[0] = false;
 	newProject.reset();
   };
+
+
+  const [data,loadng, error, get] = fetchStore('/api/getProjects');
+
+
 </script>
 
-<Header company="Precio" platformName="Dashboard" bind:isSideNavOpen>
-  <svelte:fragment slot="skip-to-content">
-    <SkipToContent />
-  </svelte:fragment>
-</Header>
-<SidenavComposite bind:isSideNavOpen />
+
+<SidenavComposite bind:isSideNavOpen = {$isSideNavOpen} />
 
 <Content>
   <Grid>
     <Row>
       <Column>
-        <h1>Welcome!</h1>
+        <h1>Precio Dashboard</h1>
       </Column>
-    </Row>
+	 </Row>
+	 {#if $data}
+	 <Row>
+		<Column>
+	   <h3 style="padding: 2rem 0;">Projects</h3>
+	   {#each $data[0] as projectName}
+	  	<Tile style="display:flex; justify-content: space-between;">
+			<div>
+				<h4>{projectName}</h4>
+			<p>Status : <span style="color:green">Active</span></p>
+			</div>
+			<div>
+			<Button kind="primary" href="/project/{projectName}">View</Button>
+			<Button kind="danger">Delete</Button>		
+			</div>
+		</Tile>
+	   {/each}
+	</Column>
+	</Row>
+	{/if}
   </Grid>
 </Content>
 
@@ -71,6 +90,7 @@
   primaryButtonDisabled={disabled[0]}
   on:click:button--secondary={closeCreateModal}
   on:submit={() =>{
+	disabled[0] = true;
 	fetch('/api/createProject', {
 		method: 'POST',
 		headers: {
@@ -81,6 +101,8 @@
 	.then(response => response.text())
 	.then(text => {
 		console.log(text);
+		get();
+		closeCreateModal();
 	})
   }}
 
