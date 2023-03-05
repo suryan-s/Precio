@@ -24,6 +24,8 @@
 
   let open = [false, false];
   let disabled = [true, true];
+  let deleteOpen = false;
+  let deleteEl = ""
 
   const closeCreateModal = () => {
 	open[0] = false;
@@ -31,7 +33,7 @@
   };
 
 
-  const [data,loadng, error, get] = fetchStore('/api/getProjects');
+  const [data,loadng, error, get] = fetchStore('http://127.0.0.1:8000/api/getTableNames');
 
 
 </script>
@@ -50,15 +52,18 @@
 	 <Row>
 		<Column>
 	   <h3 style="padding: 2rem 0;">Projects</h3>
-	   {#each $data[0] as projectName}
+	   {#each $data as projectName}
 	  	<Tile style="display:flex; justify-content: space-between;">
 			<div>
-				<h4>{projectName}</h4>
+				<h4>{projectName[0]}</h4>
 			<p>Status : <span style="color:green">Active</span></p>
 			</div>
 			<div>
 			<Button kind="primary" href="/project/{projectName}">View</Button>
-			<Button kind="danger">Delete</Button>		
+			<Button kind="danger" on:click={()=>{
+				deleteOpen = true;
+				deleteEl = projectName[0];
+			}}>Delete</Button>		
 			</div>
 		</Tile>
 	   {/each}
@@ -81,7 +86,7 @@
 
   bind:open={open[0]}
   modalHeading="New Project"
-  primaryButtonText="Save"
+  primaryButtonText="Create"
   secondaryButtonText="Cancel"
   selectorPrimaryFocus="#CreateName"
   hasScrollingContent
@@ -91,7 +96,7 @@
   on:click:button--secondary={closeCreateModal}
   on:submit={() =>{
 	disabled[0] = true;
-	fetch('/api/createProject', {
+	fetch('http://127.0.0.1:8000/api/createProject', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -111,6 +116,19 @@
  <CreateProject bind:disabled={disabled[0]} />
 </Modal>
 
+<Modal danger bind:open={deleteOpen} modalHeading="Delete Project?" primaryButtonText="Delete"
+secondaryButtonText="Cancel"
+on:click:button--secondary={() => (deleteOpen = false)}
+
+on:submit={() => {
+	  deleteOpen = false;
+	  fetch('http://127.0.0.1:8000/api/deleteProject/'+deleteEl, {
+		method: 'POST',
+	  });
+}}	
+>
+	  <p>Are you sure you want to delete this project?</p>
+</Modal>
 
 
 <style>
