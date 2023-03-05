@@ -3,11 +3,13 @@ import json
 import os
 import sqlite3
 
-import numpy as np
-import pandas as pd
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+# import numpy as np
+# import pandas as pd
+# from keras.callbacks import EarlyStopping, ModelCheckpoint
+# from sklearn.model_selection import train_test_split
+# from sklearn.preprocessing import LabelEncoder, StandardScaler
+# from keras.models import load_model
+
 # from tensorflow.keras.layers import Dense
 # from tensorflow.keras.models import Sequential
 
@@ -19,6 +21,8 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 #     "stationParameters":["Temperature","Humidity","Pressure","Wind","UV","Light","Rain","Battery Status"],
 #     "pmsParameters":["Soil Moisture","Soil Temperature/Humidity"]
 # }
+
+# model = load_model(os.path.join('model','best_pretemp.h5'))
 
 def get_client(input):
     incoming_json = json.dumps(input)
@@ -198,6 +202,7 @@ def get_gauge_data(token):
     try:          
         c.execute(get_data_sql)
         rows = c.fetchall()
+        # print(rows[0])
         parameters = [
             'date_time','maxtempC','mintempC','uvIndex',
             'DewPointC','FeelsLikeC','HeatIndexC','WindChillC',
@@ -205,8 +210,9 @@ def get_gauge_data(token):
             'tempC','winddirDegree','windspeedKmph'
         ] 
             
-        for row,parameter in zip(rows,parameters):
-            data[row] = parameter
+        for row,parameter in zip(list(rows[0]),parameters):
+            data[parameter] = row
+            # print(row,parameter)
             
         conn.commit()
         status =200
