@@ -3,10 +3,10 @@
 
 
 <p align='center'>
-    <h1><strong>PRECIO</strong></h1>
+    <h1><strong>PRECIO🌿</strong></h1>
 </p>
 
-Precio🌿 is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.                                 The software is available under the MIT License.
+Precio is a comprehensive solution designed to assist modern farmers in optimizing their agricultural operations. This document serves as a guide for developers and users of Precio, providing information on the project's features, functionality, and usage.                                 The software is available under the MIT License.
 
 ## Purpose
 
