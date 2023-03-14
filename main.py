@@ -11,6 +11,7 @@ from endpoints import *
 mimetypes.add_type('application/javascript', '.js')
 mimetypes.add_type('text/css', '.css')
 
+# http://192.168.239.143:8000/static/
 
 app = FastAPI()
 app.add_middleware(
@@ -21,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static/", StaticFiles(directory="./frontend/dist", html=True), name="static")
+app.mount("/static/", StaticFiles(directory="./frontend/build", html=True), name="static")
 
 # @app.get("/", response_class=HTMLResponse)
 # async def read_index():
