@@ -110,6 +110,8 @@ def delete_project(token):
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
+    except Exception as e:
+        print(f"The SQL statement failed with error: {e}")
     finally:
         if conn:
             conn.close()

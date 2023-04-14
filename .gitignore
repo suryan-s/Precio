@@ -129,3 +129,4 @@ dmypy.json
 /.hintrc
 /test.py
 /database/sql3.db
+/settings.json
