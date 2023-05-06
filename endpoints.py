@@ -302,7 +302,3 @@ def insert_into_table_PMS(token, datapoints):
         
 def predictBasic():
     pass
-# print(get_line_data('Garden_B5gWZiq83M'))
-# print(get_table_names())
-# print(delete_project('Farmland_OBVL0EJnB0'))
-# print(get_gauge_data('Garden_B5gWZiq83M'))
