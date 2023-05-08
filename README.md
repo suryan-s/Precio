@@ -1,7 +1,6 @@
 
 ![Banner](https://user-images.githubusercontent.com/76394506/222956195-0dd600ca-100d-4cc1-b79d-4ea2d10b4304.png)
 
-
 <p align='center'>
     <h1><strong>PRECIO🌿</strong></h1>
 </p>
@@ -36,7 +35,6 @@ This application is intended for any agricultural enthusiast and developers look
 ```
 
 Precio
-├─ .git
 ├─ .gitignore
 ├─ .vscode
 │  └─ settings.json
@@ -202,6 +200,7 @@ Push all of your updated work into this GitHub repo in the form of a Pull Reques
 ```
   git push origin main
 ```
+
 </br>
 
 <hr/>

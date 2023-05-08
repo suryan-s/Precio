@@ -1,7 +1,9 @@
 import datetime
 import json
 import os
+from dbutils.pooled_db import PooledDB
 import sqlite3
+import pandas as pd
 
 # import numpy as np
 # import pandas as pd
@@ -23,6 +25,14 @@ import sqlite3
 # }
 
 # model = load_model(os.path.join('model','best_pretemp.h5'))
+
+# Create a connection pool
+pool = PooledDB(
+    creator=sqlite3,
+    database=os.path.join('database', 'sql3.db'),
+    maxconnections=10  # Adjust the maximum number of connections as per your requirements
+)
+
 
 def get_client(input):
     incoming_json = json.dumps(input)
@@ -122,30 +132,7 @@ def delete_project(token):
 #garden_ZBFZCz9Ugn
 
 def insert_into_table_WMS(datapoints,token):
-    db_name = ""
-    tb_name = "" 
-    with open('settings.json', 'r') as f:
-        data = json.load(f)
-        # db_name = data['database']
-    tb_name = token
-    date_time = datetime.datetime.now()
-    maxtempC = datapoints['maxtempC']
-    mintempC = datapoints['mintempC']
-    uvIndex =   datapoints['uvIndex']
-    DewPointC =    datapoints['DewPointC']
-    FeelsLikeC =   datapoints['FeelsLikeC']
-    HeatIndexC =  datapoints['HeatIndexC']
-    WindChillC = datapoints['WindChillC']
-    WindGustKmph = datapoints['WindGustKmph']
-    humidity = datapoints['humidity']
-    precipMM = datapoints['precipMM']
-    pressure = datapoints['pressure']
-    tempC = datapoints['tempC']
-    visibility = datapoints['visibility']
-    winddirDegree = datapoints['winddirDegree']
-    windspeedKmphL = datapoints['windspeedKmph']
-    location = datapoints['location']
-    
+        
     insert_data_sql = '''INSERT INTO {} (
         date_time, 
         maxtempC, 
@@ -164,20 +151,46 @@ def insert_into_table_WMS(datapoints,token):
         winddirDegree, 
         windspeedKmph, 
         location
-        ) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');'''.format(tb_name, date_time, maxtempC, mintempC, uvIndex, DewPointC, FeelsLikeC, HeatIndexC, WindChillC, WindGustKmph, humidity, precipMM, pressure, tempC, visibility, winddirDegree, windspeedKmphL, location)
-    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);'''.format(token)
+    conn = pool.connection()
     status = 0
-    c = conn.cursor() 
+    cursor = conn.cursor() 
     try:          
-        c.execute(insert_data_sql)
+        cursor.execute(insert_data_sql, (datetime.datetime.now(), 
+                                         datapoints['maxtempC'], 
+                                         datapoints['mintempC'], 
+                                         datapoints['uvIndex'], 
+                                         datapoints['DewPointC'], 
+                                         datapoints['FeelsLikeC'], 
+                                         datapoints['HeatIndexC'], 
+                                         datapoints['WindChillC'], 
+                                         datapoints['WindGustKmph'], 
+                                         datapoints['humidity'], 
+                                         datapoints['precipMM'], 
+                                         datapoints['pressure'], 
+                                         datapoints['tempC'], 
+                                         datapoints['visibility'], 
+                                         datapoints['winddirDegree'], 
+                                         datapoints['windspeedKmph'], 
+                                         datapoints['location']))
         conn.commit()
-        status =200
+        if cursor.rowcount > 0:
+            status = 200
+        else:
+            status = 204
+    except sqlite3.OperationalError as e:
+        print("Operational error: ", e)
+        status = 404
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
+    except Exception as e:
+        print(f"The insert_into_table_WMS failed with error: {e}")
+        status = 500
     finally:
         if conn:
-            conn.close()
+            cursor.close()
+            # conn.close()
             return status
         
 def get_gauge_data(token):
@@ -280,25 +293,46 @@ def insert_into_table_PMS(token, datapoints):
     tempC = datapoints['tempC']
     moisture = datapoints['moisture']
     location = datapoints['location']
-    pms_insert = '''INSERT into {} (tempC, moisture, location) VALUES ('{}','{}','{}')';'''.format(token,tempC,moisture,location)
-    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    pms_insert = '''INSERT into {} (tempC, moisture, location) VALUES (?, ?, ?);'''.format(token)
+    conn = pool.connection()
     status = 0
     result = None
-    c = conn.cursor() 
+    cursor = conn.cursor() 
     try:          
-        c.execute(pms_insert)
-        rows = c.fetchall()  
-        result = json.dumps(rows)          
+        cursor.execute(pms_insert, (tempC, moisture, location))       
         conn.commit()
-        status =200
+        if cursor.rowcount > 0:
+            result = "Execution successful"
+            status = 200
+        else:
+            result = "No rows affected"
+            status = 204
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
     finally:
         if conn:
-            conn.close()
+            cursor.close()
+            # conn.close()
             return result,status
         
-        
+
+def load_sql_to_pandas(token: str):
+    conn = sqlite3.connect(os.path.join('database','sql3.db'))
+    status = 0
+    df = None
+    query = '''SELECT * FROM {};'''.format(token)
+    try:
+        df = pd.read_sql_query(query, conn)
+        print(df)
+        status = 200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        return {'status': status, 
+                'data': 'None' if df is None else df.to_json()
+                    }
+
 def predictBasic():
     pass
