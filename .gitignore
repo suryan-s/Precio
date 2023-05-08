@@ -131,3 +131,5 @@ dmypy.json
 /database/sql3.db
 /settings.json
 senti.ipynb
+/test2.py
+/.idea

@@ -8,7 +8,7 @@ run_cmd_5 = 'npm install'
 run_cmd_6 = 'npm run build'
 
 jobs = [run_cmd_1, run_cmd_2, run_cmd_3, run_cmd_4, run_cmd_5, run_cmd_6]
-for i in range(len(jobs)):
+for i in range(len(jobs)): # type: ignore
     if jobs[i].startswith(run_cmd_4):     
         os.chdir('frontend')
     else:
