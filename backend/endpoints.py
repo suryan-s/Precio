@@ -105,7 +105,6 @@ def create_project(config):
         settings = {}
         with open("settings.json", "r") as f:
             settings = json.load(f)
-            print(settings)
         new_table_list = []
         new_table_list = settings["table_names"]
         new_table_list.append(table_name)
@@ -127,11 +126,17 @@ def delete_project(token):
     delete_sql = """DROP TABLE {};""".format(token)
     conn = pool.connection()
     status = 0
+    data = None
     cursor = conn.cursor()
     try:
         val = cursor.execute(delete_sql)
         print("Deleted ", val)
         status = 200
+        with open('settings.json','r') as content:
+            data = json.load(content)        
+        data["table_names"].remove(token)
+        with open('settings.json','w') as content:
+            json.dump(data, content)    
         conn.commit()
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
