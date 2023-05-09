@@ -82,9 +82,6 @@ def create_project(config):
                             );""".format(
             table_name
         )
-    # print(create_table_sql)
-    # db_files = glob.glob(os.path.join('database', '*.db'))
-    # db_name = os.path.join('database','sql3.db')
 
     conn = pool.connection()
     cursor = conn.cursor()
@@ -103,14 +100,10 @@ def create_project(config):
     ]:
         print("Table created successfully.")
         settings = {}
-        with open("settings.json", "r") as f:
+        with open("settings.json", "r+") as f:
             settings = json.load(f)
-        new_table_list = []
-        new_table_list = settings["table_names"]
-        new_table_list.append(table_name)
-        settings["table_names"] = new_table_list
-        with open("settings.json", "w") as f:
-            f.write(json.dumps(settings))
+            settings["table_names"].append(table_name)
+            json.dump(settings,f)
         status = 200
         conn.commit()
     else:
@@ -131,13 +124,12 @@ def delete_project(token):
     try:
         val = cursor.execute(delete_sql)
         print("Deleted ", val)
-        status = 200
-        with open('settings.json','r') as content:
+        with open('settings.json','r+') as content:
             data = json.load(content)        
-        data["table_names"].remove(token)
-        with open('settings.json','w') as content:
-            json.dump(data, content)    
+            data["table_names"].remove(token)
+            json.dump(data, content)  
         conn.commit()
+        status = 200
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
@@ -147,10 +139,6 @@ def delete_project(token):
     if conn:
         cursor.close()
     return status
-
-
-# create_project("24k3423","weather")
-# garden_ZBFZCz9Ugn
 
 
 def insert_into_table_WMS(datapoints, token):
@@ -233,14 +221,14 @@ def get_gauge_data(token):
         windspeedKmph FROM {} ORDER BY date_time DESC LIMIT 1;""".format(
         token
     )
-    conn = sqlite3.connect(os.path.join("database", "sql3.db"))
+    conn = pool.connection()
     status = 0
-    c = conn.cursor()
+    cursor = conn.cursor()
     data = {}
     result = None
     try:
-        c.execute(get_data_sql)
-        rows = c.fetchall()
+        cursor.execute(get_data_sql)
+        rows = cursor.fetchall()
         # print(rows[0])
         parameters = [
             "date_time",
@@ -265,8 +253,8 @@ def get_gauge_data(token):
         status = 500
     finally:
         if conn:
-            conn.close()
-        return result, status
+            cursor.close()
+    return result, status
 
 
 def get_line_data(token, parameter):
@@ -295,13 +283,13 @@ def get_line_data(token, parameter):
             token
         )
 
-    conn = sqlite3.connect(os.path.join("database", "sql3.db"))
+    conn = pool.connection()
     status = 0
     result = None
-    c = conn.cursor()
+    cursor = conn.cursor()
     try:
-        c.execute(get_data_sql)
-        rows = c.fetchall()
+        cursor.execute(get_data_sql)
+        rows = cursor.fetchall()
         result = json.dumps(rows)
         conn.commit()
         status = 200
@@ -310,8 +298,8 @@ def get_line_data(token, parameter):
         status = 500
     finally:
         if conn:
-            conn.close()
-        return result, status
+            cursor.close()
+    return result, status
 
 
 def get_table_names():
@@ -332,7 +320,7 @@ def get_table_names():
     finally:
         if conn:
             c.close()
-        return result, status
+    return result, status
 
 
 def insert_into_table_PMS(token, datapoints):
@@ -358,7 +346,9 @@ def insert_into_table_PMS(token, datapoints):
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
-
+    except Exception as e:
+        print(f"The insert_into_table_PMS failed with error: {e}")
+        status = 500
     if conn:
         cursor.close()
     return result, status

@@ -30,4 +30,4 @@ if __name__ == "__main__":
 
     host = str(gethostbyname(gethostname())) # type: ignore
     host = "127.0.0.1"
-    uvicorn.run("main:app", port=8000, host=host)
+    uvicorn.run("main:app", port=8000, host=host, workers=3)

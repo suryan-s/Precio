@@ -25,7 +25,7 @@ This application is intended for any agricultural enthusiast and developers look
 - Run setup.py in the main directory to create virtual environment, install packages from requirements.txt and build the static files for the frontend:\
   `python setup.py`
 - Run application by:\
-  `uvicorn main:app --port 8000 --host 0.0.0.0`
+  `uvicorn main:app --port 8000 --host 127.0.0.1`
 </br>
 
 <hr/>
