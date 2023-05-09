@@ -9,7 +9,7 @@ Precio is a comprehensive solution designed to assist modern farmers in optimizi
 
 ## Purpose
 
-Precio is an open-source software tool for monitoring and visualizing farming data. It provides real-time data analysis and insights of farming, enabling informed decision-making and improving farming efficiency. Precio includes third-party integration and is designed to be user-friendly, optimizing resource usage, reducing waste, and increasing productivity.
+Precio is an open-source software tool for monitoring, automating and visualizing farming data. It provides real-time data analysis and insights of farming, enabling informed decision-making and improving farming efficiency. Precio includes third-party integration and is designed to be user-friendly, optimizing resource usage, reducing waste, and increasing productivity.
 
 ## Audience
 
