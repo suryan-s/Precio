@@ -1,4 +1,3 @@
-from socket import gethostbyname, gethostname
 
 from fastapi import HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -28,6 +27,5 @@ async def read_index():
 if __name__ == "__main__":
     import uvicorn
 
-    host = str(gethostbyname(gethostname())) # type: ignore
     host = "127.0.0.1"
     uvicorn.run("main:app", port=8000, host=host, workers=3)
