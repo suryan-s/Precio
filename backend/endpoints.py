@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import secrets
 import sqlite3
 
 import pandas as pd
@@ -33,6 +34,29 @@ pool = PooledDB(
     database=os.path.join("database", "sql3.db"),
     maxconnections=100,  # Adjust the maximum number of connections as per your requirements
 )
+
+columns_WMS = {
+            "date_time": "date_time TIMESTAMP",
+            "maxtempC": "maxtempC INTEGER",
+            "mintempC": "mintempC INTEGER",
+            "uvIndex": "uvIndex INTEGER",
+            "DewPointC": "DewPointC INTEGER",
+            "FeelsLikeC": "FeelsLikeC INTEGER",
+            "HeatIndexC": "HeatIndexC INTEGER",
+            "WindChillC": "WindChillC INTEGER",
+            "WindGustKmph": "WindGustKmph INTEGER",
+            "humidity": "humidity INTEGER",
+            "precipMM": "precipMM INTEGER",
+            "pressure": "pressure INTEGER",
+            "tempC": "tempC INTEGER",
+            "visibility": "visibility INTEGER",
+            "winddirDegree": "winddirDegree INTEGER",
+            "windspeedKmph": "windspeedKmph INTEGER",
+            "location": "location TEXT",
+            "battery": "battery INTEGER",
+            "status": "status TEXT",
+            "update": "update TEXT"
+        }
 
 
 def get_client(input):
@@ -92,7 +116,7 @@ def create_project(config):
 
     # Check if the table was created successfully
     # print(c.execute("SELECT name FROM sqlite_master WHERE type='table';"))
-    if "{}".format(table_name) in [
+    if f"{table_name}" in [
         table[0]
         for table in cursor.execute(
             "SELECT name FROM sqlite_master WHERE type='table';"
@@ -103,7 +127,7 @@ def create_project(config):
         with open("settings.json", "r+") as f:
             settings = json.load(f)
             settings["table_names"].append(table_name)
-            json.dump(settings,f)
+            json.dump(settings, f)
         status = 200
         conn.commit()
     else:
@@ -124,10 +148,10 @@ def delete_project(token):
     try:
         val = cursor.execute(delete_sql)
         print("Deleted ", val)
-        with open('settings.json','r+') as content:
-            data = json.load(content)        
+        with open("settings.json", "r+") as content:
+            data = json.load(content)
             data["table_names"].remove(token)
-            json.dump(data, content)  
+            json.dump(data, content)
         conn.commit()
         status = 200
     except sqlite3.Error as e:
@@ -372,3 +396,43 @@ def load_sql_to_pandas(token: str):
 
 def predictBasic():
     pass
+
+
+def create_project_():
+    config = {
+        "name": "Home",
+        "type": "Arable",
+        "available": "Weather Station",
+        "param": [
+            "Temperature",
+            "Humidity",
+            "Pressure",
+            "UV",
+            "Light",
+            "Visibility",
+            "WindSpd",
+            "WindDir",
+            "Precipitation",
+            "Battery",
+            "Location",
+            "Status",
+            "Update",
+        ],
+    }
+    status = 500
+    token = secrets.token_hex(5)
+    pro_name = config["name"].replace(" ", "")
+    table_name = f"{pro_name}_{token}".replace(" ", "")
+    print(f" Token: {token}, Table name: {table_name}")
+    create_table_sql = "CREATE TABLE {} (date_time TIMESTAMP,location TEXT);".format(table_name)
+    create_table_sql = ""
+    
+    if config["available"] == "Weather Station":
+        
+        for param in config["param"]:
+            create_table_sql += columns_WMS[param] + ","
+        create_table_sql = create_table_sql[:-1] + ");"
+        print(create_table_sql)
+
+
+create_project_()
