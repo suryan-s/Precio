@@ -38,4 +38,41 @@ echo Deactivating the virtual environment...
 deactivate
 echo Virtual environment deactivated.
 
-echo Batch file completed.
+REM 7. Check if Node.js is installed
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    REM Node.js is not installed, so install it
+    echo Installing Node.js...
+    curl -o node-setup.msi "https://nodejs.org/dist/v16.14.0/node-v16.14.0-x64.msi"
+    start /wait node-setup.msi
+    del node-setup.msi
+    echo Node.js installed.
+) else (
+    echo Node.js is already installed.
+)
+
+REM 8. Check if npm is installed
+npm --version >nul 2>&1
+if %errorlevel% neq 0 (
+    REM npm is not installed, so install it
+    echo Installing npm...
+    npm install npm@latest -g
+    echo npm installed.
+) else (
+    echo npm is already installed.
+)
+
+REM 9. Verify installations
+echo Verifying installations...
+node --version
+npm --version
+
+REM 10. NPM setup
+echo NPM setup...
+cd frontend
+npm install
+echo NPM setup completed.
+npm run build
+echo NPM build completed.
+
+echo Setup completed.
