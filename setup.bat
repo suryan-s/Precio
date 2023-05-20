@@ -39,6 +39,7 @@ deactivate
 echo Virtual environment deactivated.
 
 REM 7. Check if Node.js is installed
+echo Checking if Node.js is installed...
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
     REM Node.js is not installed, so install it
@@ -52,6 +53,7 @@ if %errorlevel% neq 0 (
 )
 
 REM 8. Check if npm is installed
+echo Checking if npm is installed
 npm --version >nul 2>&1
 if %errorlevel% neq 0 (
     REM npm is not installed, so install it
