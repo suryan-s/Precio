@@ -66,6 +66,21 @@ def get_client(input):
 
 
 def create_project(config):
+    """
+    Create a new project table in the database based on the provided configuration.
+
+    Args:
+        config (dict): The configuration dictionary containing project details.
+
+    Returns:
+        int: The status code indicating the result of the operation.
+            - 200: The table was created successfully.
+            - 500: An error occurred while creating the table.
+
+    Raises:
+        sqlite3.Error: If there is an error executing SQL statements.
+
+    """
     status = 500
     token = config["id"]
     print(token)
@@ -140,6 +155,22 @@ def create_project(config):
 
 
 def delete_project(token):
+    """
+    Deletes a project table from the database and updates the settings file.
+
+    Args:
+        token (str): The token identifying the project table to delete.
+
+    Returns:
+        int: The status code indicating the result of the operation.
+             - 200: Successful deletion.
+             - 500: Error occurred during deletion.
+
+    Raises:
+        sqlite3.Error: If there is an error executing the SQL statement.
+        Exception: For any other unexpected exceptions.
+
+    """
     delete_sql = """DROP TABLE {};""".format(token)
     conn = pool.connection()
     status = 0
@@ -166,6 +197,40 @@ def delete_project(token):
 
 
 def insert_into_table_WMS(datapoints, token):
+    """
+    Inserts weather datapoints into a table in the WMS database.
+
+    Args:
+        datapoints (dict): A dictionary containing the weather datapoints.
+            - maxtempC (float): Maximum temperature in Celsius.
+            - mintempC (float): Minimum temperature in Celsius.
+            - uvIndex (int): UV index.
+            - DewPointC (float): Dew point temperature in Celsius.
+            - FeelsLikeC (float): Feels like temperature in Celsius.
+            - HeatIndexC (float): Heat index temperature in Celsius.
+            - WindChillC (float): Wind chill temperature in Celsius.
+            - WindGustKmph (float): Wind gust speed in kilometers per hour.
+            - humidity (int): Humidity percentage.
+            - precipMM (float): Precipitation amount in millimeters.
+            - pressure (int): Atmospheric pressure in millibars.
+            - tempC (float): Temperature in Celsius.
+            - visibility (int): Visibility in kilometers.
+            - winddirDegree (int): Wind direction in degrees.
+            - windspeedKmph (float): Wind speed in kilometers per hour.
+            - location (str): Location identifier.
+
+        token (str): Token representing the table name.
+
+    Returns:
+        int: Status code indicating the result of the insertion.
+            - 200: Data inserted successfully.
+            - 204: No data inserted.
+            - 404: Operational error.
+            - 500: SQL statement or insertion error.
+
+    Raises:
+        None.
+    """
     insert_data_sql = """INSERT INTO {} (
         date_time, 
         maxtempC, 
@@ -235,6 +300,27 @@ def insert_into_table_WMS(datapoints, token):
 
 
 def get_gauge_data(token):
+    """
+    Retrieves the latest gauge data for a given token.
+
+    Args:
+        token (str): The token representing the gauge.
+
+    Returns:
+        tuple: A tuple containing the JSON-formatted data and the HTTP status code.
+            The JSON-formatted data contains the latest gauge information, including:
+                - date_time (str): The date and time of the data.
+                - uvIndex (float): The UV index.
+                - HeatIndexC (float): The heat index in Celsius.
+                - humidity (float): The humidity level.
+                - precipMM (float): The precipitation amount in millimeters.
+                - pressure (float): The atmospheric pressure.
+                - tempC (float): The temperature in Celsius.
+                - windspeedKmph (float): The wind speed in kilometers per hour.
+            The HTTP status code indicates the success or failure of the database query:
+                - 200: Successful query.
+                - 500: Error occurred during the SQL statement execution.
+    """
     get_data_sql = """SELECT date_time,  
         uvIndex,  
         HeatIndexC, 
@@ -282,6 +368,29 @@ def get_gauge_data(token):
 
 
 def get_line_data(token, parameter):
+    """
+    Retrieve line data based on the specified token and parameter.
+
+    Args:
+        token (str): The token used to identify the data source.
+        parameter (int): The parameter indicating the type of data to retrieve:
+            - 0: Temperature data (maxtempC, mintempC, tempC)
+            - 1: Humidity data
+            - 2: Precipitation data
+            - 3: Pressure data
+
+    Returns:
+        tuple: A tuple containing the retrieved data and the status code.
+            - result (str): The retrieved data in JSON format.
+            - status (int): The status code indicating the success or failure of the operation.
+                - 200: Success
+                - 500: Internal server error
+
+    Note:
+        - The retrieved data is limited to the latest 50 records.
+        - The 'result' value will be None if an error occurs during the database operation.
+
+    """
     get_data_sql = """"""
     if parameter == 0:
         get_data_sql = """SELECT date_time, 
@@ -327,6 +436,19 @@ def get_line_data(token, parameter):
 
 
 def get_table_names():
+    """
+    Retrieves the names of tables from the SQLite database.
+
+    Executes a SQL statement to fetch the names of tables from the 'sqlite_master' system table.
+    The retrieved table names are returned as a JSON string.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - str: A JSON string representing the names of tables.
+            - int: The status code indicating the result of the operation.
+                - 200: Success.
+                - 500: Error encountered while executing the SQL statement.
+    """
     table_names = """SELECT name FROM sqlite_master WHERE type='table';"""
     conn = pool.connection()
     status = 0
@@ -348,6 +470,26 @@ def get_table_names():
 
 
 def insert_into_table_PMS(token, datapoints):
+    """
+    Inserts data into a specified table in the PMS database.
+
+    Args:
+        token (str): The name of the table to insert data into.
+        datapoints (dict): A dictionary containing the data points to be inserted.
+            The dictionary should have the following keys:
+            - "tempC" (float): The temperature in degrees Celsius.
+            - "moisture" (float): The moisture level.
+            - "location" (str): The location where the data was recorded.
+
+    Returns:
+        tuple: A tuple containing the result message and the HTTP status code.
+            - result (str): The result message indicating the execution status.
+            - status (int): The HTTP status code indicating the result status.
+
+    Raises:
+        sqlite3.Error: If there is an error executing the SQL statement.
+        Exception: If there is an unexpected error during the function execution.
+    """
     tempC = datapoints["tempC"]
     moisture = datapoints["moisture"]
     location = datapoints["location"]
@@ -379,6 +521,27 @@ def insert_into_table_PMS(token, datapoints):
 
 
 def load_sql_to_pandas(token: str):
+    """
+    Loads data from an SQLite database table into a pandas DataFrame.
+
+    Args:
+        token (str): The name of the table to load data from.
+
+    Returns:
+        dict: A dictionary containing the status and data.
+            - 'status' (int): The status code indicating the result of the operation.
+                - 200: Successful operation.
+                - 500: Error occurred during the SQL statement execution.
+            - 'data' (str): The loaded data as a JSON string. 'None' if no data is available.
+
+    Raises:
+        sqlite3.Error: If there is an error during the SQL statement execution.
+
+    Example:
+        >>> result = load_sql_to_pandas('my_table')
+        >>> print(result)
+        {'status': 200, 'data': '{"column1": [1, 2, 3], "column2": ["a", "b", "c"]}'}        
+    """
     conn = sqlite3.connect(os.path.join("database", "sql3.db"))
     status = 0
     df = None
@@ -435,4 +598,4 @@ def create_project_():
         print(create_table_sql)
 
 
-create_project_()
+

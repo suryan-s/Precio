@@ -28,4 +28,4 @@ if __name__ == "__main__":
     import uvicorn
 
     host = "127.0.0.1"
-    uvicorn.run("main:app", port=8000, host=host, workers=3)
+    uvicorn.run("main:app", port=8000, host=host, reload=True)

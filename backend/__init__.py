@@ -1,3 +1,17 @@
+"""
+Precio
+
+An open-source software tool for monitoring, automating, and visualizing farming data.
+This program utilizes the FastAPI framework and provides real-time data analysis and insights of farming, enabling informed decision-making and improving farming efficiency.
+
+Modules:
+    - backend.api: Contains routes for FastAPI.
+    - backend.endpoints: Defines the endpoints for the API.
+    - backend.pms: Provides functionality for the Plant Monitoring System.
+    - backend.schemas: Contains data schemas and models for the API.
+    - backend.wms: Provides functionality for the Weather Monitoring System.
+"""
+
 import mimetypes
 
 from fastapi import FastAPI

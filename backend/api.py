@@ -1,10 +1,28 @@
 
+"""
+This module contains the FastAPI endpoints for the application.
+
+Functions:
+- connect_: Handles the POST request to '/api/condevice' endpoint. Retrieves client information.
+- connect: Handles the GET request to '/api/test' endpoint. Returns a status message.
+- create_table: Handles the POST request to '/api/createProject' endpoint. Creates a project table.
+- delete_table: Handles the POST request to '/api/deleteProject/{api_token}' endpoint. Deletes a project table.
+- get_table: Handles the GET request to '/api/getTableNames' endpoint. Retrieves table names.
+- get_graph: Handles the GET request to '/api/getLineGraph/{api_token}/{graph}' endpoint. Retrieves line graph data.
+- get_gauge: Handles the GET request to '/api/getGauge/{api_token}' endpoint. Retrieves gauge data.
+- predict_basic: Handles the GET request to '/api/predict/basic' endpoint. Performs a basic prediction.
+
+Exceptions:
+- HTTPException: Raised when an internal server error occurs.
+
+"""
 from fastapi import HTTPException, Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from backend import app
-from backend.endpoints import *
-from backend.schemas import *
+from backend.endpoints import (create_project, delete_project, get_client,
+                               get_gauge_data, get_line_data, get_table_names,
+                               predictBasic)
 
 
 @app.post("/api/condevice")
