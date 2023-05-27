@@ -130,7 +130,6 @@ def create_project(config):
         print(e)
 
     # Check if the table was created successfully
-    # print(c.execute("SELECT name FROM sqlite_master WHERE type='table';"))
     if f"{table_name}" in [
         table[0]
         for table in cursor.execute(
@@ -138,11 +137,12 @@ def create_project(config):
         )
     ]:
         print("Table created successfully.")
-        settings = {}
-        with open("settings.json", "r+") as f:
-            settings = json.load(f)
-            settings["table_names"].append(table_name)
-            json.dump(settings, f)
+        # settings = {}
+        # with open("settings.json", "r+") as content:
+        #     settings = json.load(content)
+        #     content.truncate(0)
+        #     settings["table_names"].append(table_name)
+        #     json.dump(settings, content)
         status = 200
         conn.commit()
     else:
@@ -179,18 +179,19 @@ def delete_project(token):
     try:
         val = cursor.execute(delete_sql)
         print("Deleted ", val)
-        with open("settings.json", "r+") as content:
-            data = json.load(content)
-            data["table_names"].remove(token)
-            json.dump(data, content)
-        conn.commit()
+        # with open("settings.json", "r+") as content:
+        #     data = json.load(content)
+        #     content.truncate(0)
+        #     data["table_names"].remove(token)
+        #     json.dump(data, content)    
         status = 200
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
     except Exception as e:
-        print(f"The SQL statement failed with error: {e}")
+        print(f"Exception occured at delete project with error: {e}")
         status = 500
+    conn.commit()
     if conn:
         cursor.close()
     return status
