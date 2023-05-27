@@ -1,12 +1,12 @@
-from fastapi import HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend import app
 from backend.endpoints import insert_into_table_WMS, load_sql_to_pandas
 from backend.schemas import WMSData
 
+router = APIRouter()
 
-@app.post("/api/WMS/{api_token}")
+@router.post("/api/WMS/{api_token}")
 async def update_wms(api_token: str, request: Request, data: WMSData):
     """
     Updates WMS(Weather Monitoring System) data in the database.
@@ -36,7 +36,7 @@ async def update_wms(api_token: str, request: Request, data: WMSData):
         raise HTTPException(status_code=500, detail=str(error))
 
 
-@app.get("/api/WMS/Insight/{api_token}")
+@router.get("/api/WMS/Insight/{api_token}")
 async def insight_load_sql(api_token: str) -> dict:
     """
     Loads WMS data from the database using a SQL query.

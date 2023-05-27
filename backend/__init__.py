@@ -14,8 +14,12 @@ Modules:
 
 import mimetypes
 
+from api import router as api_route
+from auth import router as auth_route
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pms import router as pms_route
+from wms import router as wms_route
 
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
@@ -23,7 +27,7 @@ mimetypes.add_type("text/css", ".css")
 app = FastAPI(
     title="Precio",
     version="1.0.0",
-    contact={"name": "S Suryan", "email": "suryannasa@gmail.com"},
+    # contact={"name": "S Suryan", "email": "suryannasa@gmail.com"},
     description="""
     Precio is an open-source software tool for monitoring,
     automating and visualizing farming data. It provides
@@ -40,8 +44,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-import backend.api
-import backend.endpoints
-import backend.pms
-import backend.schemas
-import backend.wms
+app.include_router(api_route)
+app.include_router(auth_route)
+app.include_router(pms_route)
+app.include_router(wms_route)

@@ -1,10 +1,10 @@
-from fastapi import HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 
-from backend import app
 from backend.endpoints import insert_into_table_PMS
 
+router = APIRouter()
 
-@app.post("/api/PMS/{api_token}")
+@router.post("/api/PMS/{api_token}")
 async def update_pms(api_token: str, request: Request) -> dict:
     """
     Updates the PMS (Plant Monitoring System) using the provided API token and request data.

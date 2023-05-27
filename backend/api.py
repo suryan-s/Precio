@@ -16,16 +16,16 @@ Exceptions:
 - HTTPException: Raised when an internal server error occurs.
 
 """
-from fastapi import HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend import app
 from backend.endpoints import (create_project, delete_project, get_client,
                                get_gauge_data, get_line_data, get_table_names,
                                predictBasic)
 
+router = APIRouter()
 
-@app.post("/api/condevice")
+@router.post("/api/condevice")
 async def connect_(request: Request):
     try:
         incoming = await request.json()
@@ -34,7 +34,7 @@ async def connect_(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/test")
+@router.get("/api/test")
 async def connect() -> dict:
     try:
         print("Called status")
@@ -43,7 +43,7 @@ async def connect() -> dict:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/createProject")
+@router.post("/api/createProject")
 async def create_table(request: Request) -> dict:
     try:
         incoming = await request.json()
@@ -53,7 +53,7 @@ async def create_table(request: Request) -> dict:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/deleteProject/{api_token}")
+@router.post("/api/deleteProject/{api_token}")
 async def delete_table(api_token: str):
     try:
         # status = None
@@ -65,7 +65,7 @@ async def delete_table(api_token: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/getTableNames")
+@router.get("/api/getTableNames")
 async def get_table():
     try:
         return get_table_names()
@@ -73,7 +73,7 @@ async def get_table():
         raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@app.get("/api/getLineGraph/{api_token}/{graph}")
+@router.get("/api/getLineGraph/{api_token}/{graph}")
 async def get_graph(api_token: str, graph: int):
     try:
         return get_line_data(api_token, graph)
@@ -81,7 +81,7 @@ async def get_graph(api_token: str, graph: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/getGauge/{api_token}")
+@router.get("/api/getGauge/{api_token}")
 async def get_gauge(api_token: str):
     try:
         return get_gauge_data(api_token)
@@ -89,7 +89,7 @@ async def get_gauge(api_token: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/predict/basic")
+@router.get("/api/predict/basic")
 async def predict_basic():
     try:
         return predictBasic()
