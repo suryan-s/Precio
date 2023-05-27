@@ -52,24 +52,12 @@ if %errorlevel% neq 0 (
     echo Node.js is already installed.
 )
 
-REM 8. Check if npm is installed
-echo Checking if npm is installed
-npm --version >nul 2>&1
-if %errorlevel% neq 0 (
-    REM npm is not installed, so install it
-    echo Installing npm...
-    npm install npm@latest -g
-    echo npm installed.
-) else (
-    echo npm is already installed.
-)
-
-REM 9. Verify installations
+REM 8. Verify installations
 echo Verifying installations...
 node --version
 npm --version
 
-REM 10. NPM setup
+REM 9. NPM setup
 echo NPM setup...
 cd frontend
 npm install
