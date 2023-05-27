@@ -127,11 +127,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /.hintrc
-/test.py
 /database/sql3.db
 /settings.json
 senti.ipynb
-/test2.py
 /.idea
 /backup
 /resources.txt
+/test
