@@ -1,4 +1,4 @@
-
+import uvicorn
 from fastapi import HTTPException
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
@@ -25,7 +25,5 @@ async def read_index():
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     host = "127.0.0.1"
     uvicorn.run("main:app", port=8000, host=host, reload=True)
