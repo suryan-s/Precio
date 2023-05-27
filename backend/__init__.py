@@ -14,12 +14,12 @@ Modules:
 
 import mimetypes
 
-from api import router as api_route
-from auth import router as auth_route
+from backend.api import router as api_route
+from backend.auth import router as auth_route
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pms import router as pms_route
-from wms import router as wms_route
+from backend.pms import router as pms_route
+from backend.wms import router as wms_route
 
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
