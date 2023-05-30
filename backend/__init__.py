@@ -2,7 +2,8 @@
 Precio
 
 An open-source software tool for monitoring, automating, and visualizing farming data.
-This program utilizes the FastAPI framework and provides real-time data analysis and insights of farming, enabling informed decision-making and improving farming efficiency.
+This program utilizes the FastAPI framework and provides real-time data analysis and
+insights of farming, enabling informed decision-making and improving farming efficiency.
 
 Modules:
     - backend.api: Contains routes for FastAPI.
@@ -14,10 +15,11 @@ Modules:
 
 import mimetypes
 
-from backend.api import router as api_route
-from backend.auth import router as auth_route
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from backend.api import router as api_route
+from backend.auth import router as auth_route
 from backend.pms import router as pms_route
 from backend.wms import router as wms_route
 

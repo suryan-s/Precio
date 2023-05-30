@@ -1,3 +1,23 @@
+"""
+Module to serve a FastAPI application with static files Uvicorn.
+
+The module sets up a FastAPI application and mounts a directory
+containing static files using the Starlette `StaticFiles` class.
+
+The root URL ("/") is handled to redirect to the static files.
+
+The application can be started using the Uvicorn server by running
+the command: uvicorn main:app --reload
+
+Usage:
+    python main.py
+
+Dependencies:
+    - uvicorn
+    - fastapi
+    - starlette
+
+"""
 import uvicorn
 from fastapi import HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -18,12 +38,29 @@ app.mount(
 
 @app.get("/")
 async def read_index():
+    """
+    Handles the root URL ("/") to redirect to the static files.
+    This function redirects the root URL to the static files served
+    from the "/static/" URL.   
+
+    Returns:
+        RedirectResponse: Redirects to the static files.
+
+    Raises:
+        HTTPException:
+            The status code is set to HTTP 500 Internal Server Error,
+            and the detail contains the error message.
+
+    """
     try:
         return RedirectResponse(url="static")
-    except Exception as e:
-        raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except Exception as error:
+        raise HTTPException(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error"
+            ) from error
 
 
 if __name__ == "__main__":
-    host = "127.0.0.1"
-    uvicorn.run("main:app", port=8000, host=host, reload=True)
+    HOST = "127.0.0.1"
+    uvicorn.run("main:app", port=8000, host=HOST, reload=True)
