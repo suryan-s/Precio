@@ -29,7 +29,6 @@ mimetypes.add_type("text/css", ".css")
 app = FastAPI(
     title="Precio",
     version="1.0.0",
-    # contact={"name": "S Suryan", "email": "suryannasa@gmail.com"},
     description="""
     Precio is an open-source software tool for monitoring,
     automating and visualizing farming data. It provides
