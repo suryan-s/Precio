@@ -1,17 +1,26 @@
 import secrets
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from pydantic import BaseModel
 
-from backend.schemas import User
+from backend.endpoints import add_user, get_password, get_userid
+
+
+class User(BaseModel):
+    username: str
+    password: str
+    email:str
+    
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 router = APIRouter()
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -26,45 +35,24 @@ def get_password_hash(password):
 
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        if len(hashed_password) == 0 or hashed_password is None:
+            print("Verification false")
+            return False
+        else:
+            return pwd_context.verify(plain_password, hashed_password)
+    except Exception as e:
+        print("Error occured at verify password : ",e)
+        return False
 
 
-def create_access_token(data: dict, expires_delta: timedelta):
+def create_access_token(data: dict, expires_delta: timedelta) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
+    to_encode.update( {"iat": datetime.utcnow()})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        expiration_time = datetime.fromtimestamp(payload["exp"])
-        current_time = datetime.utcnow()
-        print("current_time > expiration_time : ", current_time > expiration_time)
-        username: str = payload.get("sub")  # type: ignore
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    user = get_user(username=username)
-    if user is None:
-        raise credentials_exception
-    return user
-
-
-def get_user(username: str):
-    for user in fake_users_db:
-        if user["username"] == username:
-            return User(**user)
-    return None
-
 
 def is_token_expired(token: str):
     try:
@@ -75,35 +63,50 @@ def is_token_expired(token: str):
     except JWTError:
         # Invalid token format or signature
         return True
+    
+def check_user(request: Request):
+    token = request.headers.get("Authorization")
+    print(token)
+    if not token or is_token_expired(token):
+        return 401
+    else:
+        return 200
 
+@router.post("/auth/register", response_model=Token)
+async def register(request: Request, user: User):
+    try:
+        incomming = await request.json()
+        user_id = secrets.token_hex(8)
+        username = incomming['username']
+        hashed_password = get_password_hash(incomming['password'])
+        email_id = incomming['email']
+        result = await add_user(user_id, username, hashed_password, email_id)
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user_id}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        )
 
-fake_users_db = [
-    {"username": "suryan", "password": get_password_hash("suryan")},
-    {"username": "user", "password": get_password_hash("pass")},
-]
-
-
-@router.post("/token")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = get_user(username=form_data.username)
-    if not user or not verify_password(form_data.password, user.password):
+@router.post("/auth/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    username = form_data.username
+    password = form_data.password
+    stored_hashed_password = await get_password(username)
+    print(stored_hashed_password)
+    if stored_hashed_password is None or not verify_password(password, stored_hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
         )
+    user_id = await get_userid(username) 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user_id}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.get("/protected-route")
-def protected_route(current_user: User = Depends(get_current_user)):
-    return {"message": "You are accessing a protected route!"}
-
-
-@router.get("/verify-token")
-def verify(current_user: User = Depends(get_current_user)):
-    return {"message": "Token is valid!"}

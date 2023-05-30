@@ -64,8 +64,69 @@ def get_client(input):
     incoming_json = json.loads(incoming_json)
     print(incoming_json)
 
+async def create_tables():
+    """
+    Creates tables in the database if they do not exist.
 
-def create_project(config):
+    This function creates the following tables in the database:
+    - users: Stores information about users.
+    - projects: Stores information about projects, including the user who owns the project.
+    - devices: Stores information about devices associated with projects and users.
+    - data: Stores data entries for devices.
+
+    If the tables already exist, the function does not modify them.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    conn = pool.connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            user_id TEXT PRIMARY KEY,
+            username TEXT,
+            password_hash TEXT,
+            email TEXT
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS projects (
+            project_id TEXT PRIMARY KEY,
+            project_name TEXT,
+            project_created TIMESTAMP,
+            project_description TEXT,
+            project_type TEXT,
+            user_id TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS devices (
+            device_id TEXT PRIMARY KEY,
+            device_name TEXT,
+            device_type TEXT,
+            user_id INTEGER,
+            project_id TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(user_id),
+            FOREIGN KEY (project_id) REFERENCES projects(project_id)
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS data (
+            device_id TEXT,
+            value TEXT,
+            param TEXT,
+            timestamp TIMESTAMP PRIMARY KEY,
+            FOREIGN KEY (device_id) REFERENCES devices(device_id)
+        )
+    """ )
+    conn.commit()
+    cursor.close()
+
+async def create_project(config):
     """
     Create a new project table in the database based on the provided configuration.
 
@@ -154,7 +215,7 @@ def create_project(config):
     return status
 
 
-def delete_project(token):
+async def delete_project(token):
     """
     Deletes a project table from the database and updates the settings file.
 
@@ -300,7 +361,7 @@ def insert_into_table_WMS(datapoints, token):
     return status
 
 
-def get_gauge_data(token):
+async def get_gauge_data(token):
     """
     Retrieves the latest gauge data for a given token.
 
@@ -368,7 +429,7 @@ def get_gauge_data(token):
     return result, status
 
 
-def get_line_data(token, parameter):
+async def get_line_data(token, parameter):
     """
     Retrieve line data based on the specified token and parameter.
 
@@ -436,7 +497,7 @@ def get_line_data(token, parameter):
     return result, status
 
 
-def get_table_names():
+async def get_table_names():
     """
     Retrieves the names of tables from the SQLite database.
 
@@ -561,6 +622,63 @@ def load_sql_to_pandas(token: str):
 def predictBasic():
     pass
 
+
+async def get_password(username):
+    conn = pool.connection()
+    cursor = conn.cursor()
+    result = None
+    try:
+        # print("start")
+        cursor.execute("SELECT password_hash FROM users WHERE username = ?", (username,))
+
+        result = cursor.fetchall()
+        # print(result)
+        conn.commit()        
+    except sqlite3.Error as e:
+        print(f"get_password: The SQL statement failed with error: {e}")
+    finally:
+        if conn:
+            cursor.close()            
+    if result is not None:
+        if len(result) > 0:
+            return list(result[0])[0]
+    else:
+        return None
+    
+async def get_userid(username):
+    conn = pool.connection()
+    cursor = conn.cursor()
+    result = None
+    try:
+        cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
+        result = cursor.fetchall()
+        conn.commit()        
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+    finally:
+        if conn:
+            cursor.close()            
+    if result is not None:
+        if len(result) > 0:
+            return list(result[0])[0]
+    else:
+        return None
+    
+async def add_user(userid,username, password, email):
+    conn = pool.connection()
+    cursor = conn.cursor()
+    status = 0
+    try:
+        cursor.execute("INSERT INTO users (user_id, username, password_hash, email) VALUES (?,?,?,?)", (userid, username, password, email))
+        conn.commit()
+        status = 200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            cursor.close()
+    return status
 
 def create_project_():
     config = {
