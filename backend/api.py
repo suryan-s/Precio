@@ -19,11 +19,16 @@ Exceptions:
 from fastapi import APIRouter, HTTPException, Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend.endpoints import (create_project, delete_project, get_client,
-                               get_gauge_data, get_line_data, get_table_names,
-                               predictBasic)
+from backend.endpoints import (create_project, create_tables, delete_project,
+                               get_client, get_gauge_data, get_line_data,
+                               get_table_names, predictBasic)
 
 router = APIRouter()
+
+@router.on_event("startup")
+async def startup():
+    await create_tables()
+    print("Startup complete")
 
 @router.post("/api/condevice")
 async def connect_(request: Request):
@@ -47,7 +52,7 @@ async def connect() -> dict:
 async def create_table(request: Request) -> dict:
     try:
         incoming = await request.json()
-        status = create_project(incoming)
+        status = await create_project(incoming)
         return {"status": status}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -57,7 +62,7 @@ async def create_table(request: Request) -> dict:
 async def delete_table(api_token: str):
     try:
         # status = None
-        status = delete_project(api_token)
+        status = await delete_project(api_token)
         print("Status: ", status)
         return {"status": status}
     except Exception as e:
@@ -68,7 +73,7 @@ async def delete_table(api_token: str):
 @router.get("/api/getTableNames")
 async def get_table():
     try:
-        return get_table_names()
+        return await get_table_names()
     except Exception as e:
         raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
@@ -76,7 +81,8 @@ async def get_table():
 @router.get("/api/getLineGraph/{api_token}/{graph}")
 async def get_graph(api_token: str, graph: int):
     try:
-        return get_line_data(api_token, graph)
+        result = await get_line_data(api_token, graph)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -84,7 +90,7 @@ async def get_graph(api_token: str, graph: int):
 @router.get("/api/getGauge/{api_token}")
 async def get_gauge(api_token: str):
     try:
-        return get_gauge_data(api_token)
+        return await get_gauge_data(api_token)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
