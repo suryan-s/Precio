@@ -9,16 +9,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from backend.endpoints import add_user, get_password, get_userid
-
-
-class User(BaseModel):
-    username: str
-    password: str
-    email:str
-  
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+from backend.schemas import Token, User
 
 router = APIRouter()
 

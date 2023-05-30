@@ -4,6 +4,13 @@ from pydantic import BaseModel
 class User(BaseModel):
     username: str
     password: str
+    email: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
 
 class WMSData(BaseModel):
     maxtempC: int
@@ -22,4 +29,3 @@ class WMSData(BaseModel):
     winddirDegree: int
     windspeedKmph: int
     location: str
-
