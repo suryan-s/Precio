@@ -8,8 +8,10 @@ class User(BaseModel):
 
 
 class Token(BaseModel):
+    status: int
     access_token: str
     token_type: str
+    message: str
 
 
 class WMSData(BaseModel):

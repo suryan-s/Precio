@@ -69,20 +69,22 @@ async def register(request: Request, user: User):
         user_id = secrets.token_hex(8)
         username = incomming["username"]
         hashed_password = get_password_hash(incomming["password"])
-        email_id = incomming["email"]        
-        stat = await get_userid(username)
-        if stat is None:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Username already exists",
-            )        
-        await add_user(user_id, username, hashed_password, email_id)
+        email_id = incomming["email"]
+        res = await add_user(user_id, username, hashed_password, email_id)
+        print("add user: ",res)
+        if res == 409:
+            # raise HTTPException(
+            #         status_code=status.HTTP_409_CONFLICT,
+            #         detail="Username already exists",
+            #     )
+            return {"status": 409, "message": "User already exists", "access_token": "", "token_type": "bearer"}
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": user_id}, expires_delta=access_token_expires
         )
-        return {"access_token": access_token, "token_type": "bearer"}
+        return {"access_token": access_token, "token_type": "bearer", "status": 200, "message": "User created successfully"}
     except Exception as error:
+        print(error)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error",
@@ -102,9 +104,16 @@ async def login(request : Request, form_data: OAuth2PasswordRequestForm = Depend
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
         )
-    user_id = await get_userid(username)
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user_id}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+    result = get_userid(username)
+    if result['status']=='success':
+        user_id = result['userid']
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user_id}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        ) 

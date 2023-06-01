@@ -245,7 +245,6 @@ async def delete_project(token):
     delete_sql = """DROP TABLE {};""".format(token)
     conn = pool.connection()
     status = 0
-    data = None
     cursor = conn.cursor()
     try:
         val = cursor.execute(delete_sql)
@@ -658,30 +657,35 @@ async def get_password(username):
         return None
 
 
-async def get_userid(username):
+def get_userid(username):
     conn = pool.connection()
     cursor = conn.cursor()
-    result = None
+    result = {'status': 'failed', 'userid': None}  # Initialize with default values
     try:
         cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
-        result = cursor.fetchall()
+        rows = cursor.fetchall()
+        if rows:
+            result['status'] = 'success'
+            result['userid'] = rows[0][0]
         conn.commit()
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
     finally:
         if conn:
             cursor.close()
-    if result is not None:
-        if len(result) > 0:
-            return list(result[0])[0]
-    else:
-        return None
+            conn.close()
+    return result
+
 
 
 async def add_user(userid, username, password, email):
     conn = pool.connection()
     cursor = conn.cursor()
     status = 0
+    stat = get_userid(username)
+    if stat['status'] == 'success':
+        status = 409
+        return status
     try:
         cursor.execute(
             "INSERT INTO users (user_id, username, password_hash, email) VALUES (?,?,?,?)",
