@@ -89,7 +89,3 @@ def create_project(config):
     if conn: 
         cursor.close()
     return status
-
-
-
-

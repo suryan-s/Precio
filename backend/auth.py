@@ -30,7 +30,7 @@ def verify_password(plain_password, hashed_password):
             return False
         return pwd_context.verify(plain_password, hashed_password)
     except Exception as e:
-        print("Error occured at verify password : ",e)
+        print("Error occured at verify password : ", e)
         return False
 
 
@@ -38,9 +38,10 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    to_encode.update( {"iat": datetime.utcnow()})
+    to_encode.update({"iat": datetime.utcnow()})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 def is_token_expired(token: str):
     try:
@@ -52,6 +53,7 @@ def is_token_expired(token: str):
         # Invalid token format or signature
         return True
 
+
 def check_user(request: Request):
     token = request.headers.get("Authorization")
     print(token)
@@ -59,14 +61,15 @@ def check_user(request: Request):
         return 401
     return 200
 
+
 @router.post("/auth/register", response_model=Token)
 async def register(request: Request, user: User):
     try:
         incomming = await request.json()
         user_id = secrets.token_hex(8)
-        username = incomming['username']
-        hashed_password = get_password_hash(incomming['password'])
-        email_id = incomming['email']
+        username = incomming["username"]
+        hashed_password = get_password_hash(incomming["password"])
+        email_id = incomming["email"]
         await add_user(user_id, username, hashed_password, email_id)
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
@@ -79,13 +82,16 @@ async def register(request: Request, user: User):
             detail="Internal Server Error",
         ) from error
 
+
 @router.post("/auth/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     username = form_data.username
     password = form_data.password
     stored_hashed_password = await get_password(username)
     print(stored_hashed_password)
-    if stored_hashed_password is None or not verify_password(password, stored_hashed_password):
+    if stored_hashed_password is None or not verify_password(
+        password, stored_hashed_password
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

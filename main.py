@@ -41,7 +41,7 @@ async def read_index():
     """
     Handles the root URL ("/") to redirect to the static files.
     This function redirects the root URL to the static files served
-    from the "/static/" URL.   
+    from the "/static/" URL.
 
     Returns:
         RedirectResponse: Redirects to the static files.
@@ -56,9 +56,8 @@ async def read_index():
         return RedirectResponse(url="static")
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error"
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
 
 
 if __name__ == "__main__":

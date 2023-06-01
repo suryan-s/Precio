@@ -1,4 +1,3 @@
-
 """
 This module contains the FastAPI endpoints for the application.
 
@@ -22,11 +21,19 @@ Exceptions:
 from fastapi import APIRouter, HTTPException, Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend.endpoints import (create_project, create_tables, delete_project,
-                               get_client, get_gauge_data, get_line_data,
-                               get_table_names, predictBasic)
+from backend.endpoints import (
+    create_project,
+    create_tables,
+    delete_project,
+    get_client,
+    get_gauge_data,
+    get_line_data,
+    get_table_names,
+    predictBasic,
+)
 
 router = APIRouter()
+
 
 @router.on_event("startup")
 async def startup():
@@ -65,9 +72,9 @@ async def connect_(request: Request):
         return get_client(incoming)
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.get("/api/test")
 async def connect() -> dict:
@@ -87,9 +94,9 @@ async def connect() -> dict:
         return {"message": "Server up and running"}
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.post("/api/createProject")
 async def create_table(request: Request) -> dict:
@@ -111,9 +118,9 @@ async def create_table(request: Request) -> dict:
         return {"status": status}
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.post("/api/deleteProject/{api_token}")
 async def delete_table(api_token: str):
@@ -135,9 +142,9 @@ async def delete_table(api_token: str):
         return {"status": status}
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.get("/api/getTableNames")
 async def get_table():
@@ -157,9 +164,9 @@ async def get_table():
         return await get_table_names()
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.get("/api/getLineGraph/{api_token}/{graph}")
 async def get_graph(api_token: str, graph: int):
@@ -182,16 +189,16 @@ async def get_graph(api_token: str, graph: int):
         return result
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.get("/api/getGauge/{api_token}")
 async def get_gauge(api_token: str):
     """
     Retrieves data for a gauge.
 
-    This route handles a GET request to retrieve data for a gauge 
+    This route handles a GET request to retrieve data for a gauge
     specified by the `api_token` parameter.
     It calls the `get_gauge_data` function to retrieve the gauge data.
 
@@ -205,9 +212,9 @@ async def get_gauge(api_token: str):
         return await get_gauge_data(api_token)
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
 
 @router.get("/api/predict/basic")
 async def predict_basic():
@@ -227,6 +234,5 @@ async def predict_basic():
         return predictBasic()
     except Exception as error:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Internal Server Error'
-            ) from error
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error

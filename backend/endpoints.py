@@ -36,33 +36,34 @@ pool = PooledDB(
 )
 
 columns_WMS = {
-            "date_time": "date_time TIMESTAMP",
-            "maxtempC": "maxtempC INTEGER",
-            "mintempC": "mintempC INTEGER",
-            "uvIndex": "uvIndex INTEGER",
-            "DewPointC": "DewPointC INTEGER",
-            "FeelsLikeC": "FeelsLikeC INTEGER",
-            "HeatIndexC": "HeatIndexC INTEGER",
-            "WindChillC": "WindChillC INTEGER",
-            "WindGustKmph": "WindGustKmph INTEGER",
-            "humidity": "humidity INTEGER",
-            "precipMM": "precipMM INTEGER",
-            "pressure": "pressure INTEGER",
-            "tempC": "tempC INTEGER",
-            "visibility": "visibility INTEGER",
-            "winddirDegree": "winddirDegree INTEGER",
-            "windspeedKmph": "windspeedKmph INTEGER",
-            "location": "location TEXT",
-            "battery": "battery INTEGER",
-            "status": "status TEXT",
-            "update": "update TEXT"
-        }
+    "date_time": "date_time TIMESTAMP",
+    "maxtempC": "maxtempC INTEGER",
+    "mintempC": "mintempC INTEGER",
+    "uvIndex": "uvIndex INTEGER",
+    "DewPointC": "DewPointC INTEGER",
+    "FeelsLikeC": "FeelsLikeC INTEGER",
+    "HeatIndexC": "HeatIndexC INTEGER",
+    "WindChillC": "WindChillC INTEGER",
+    "WindGustKmph": "WindGustKmph INTEGER",
+    "humidity": "humidity INTEGER",
+    "precipMM": "precipMM INTEGER",
+    "pressure": "pressure INTEGER",
+    "tempC": "tempC INTEGER",
+    "visibility": "visibility INTEGER",
+    "winddirDegree": "winddirDegree INTEGER",
+    "windspeedKmph": "windspeedKmph INTEGER",
+    "location": "location TEXT",
+    "battery": "battery INTEGER",
+    "status": "status TEXT",
+    "update": "update TEXT",
+}
 
 
 def get_client(input):
     incoming_json = json.dumps(input)
     incoming_json = json.loads(incoming_json)
     print(incoming_json)
+
 
 async def create_tables():
     """
@@ -84,15 +85,18 @@ async def create_tables():
     """
     conn = pool.connection()
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS users (
             user_id TEXT PRIMARY KEY,
             username TEXT,
             password_hash TEXT,
             email TEXT
         )
-    """)
-    cursor.execute("""
+    """
+    )
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS projects (
             project_id TEXT PRIMARY KEY,
             project_name TEXT,
@@ -102,8 +106,10 @@ async def create_tables():
             user_id TEXT,
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
-    """)
-    cursor.execute("""
+    """
+    )
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS devices (
             device_id TEXT PRIMARY KEY,
             device_name TEXT,
@@ -113,8 +119,10 @@ async def create_tables():
             FOREIGN KEY (user_id) REFERENCES users(user_id),
             FOREIGN KEY (project_id) REFERENCES projects(project_id)
         )
-    """)
-    cursor.execute("""
+    """
+    )
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS data (
             device_id TEXT,
             value TEXT,
@@ -122,9 +130,11 @@ async def create_tables():
             timestamp TIMESTAMP PRIMARY KEY,
             FOREIGN KEY (device_id) REFERENCES devices(device_id)
         )
-    """ )
+    """
+    )
     conn.commit()
     cursor.close()
+
 
 async def create_project(config):
     """
@@ -244,7 +254,7 @@ async def delete_project(token):
         #     data = json.load(content)
         #     content.truncate(0)
         #     data["table_names"].remove(token)
-        #     json.dump(data, content)    
+        #     json.dump(data, content)
         status = 200
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
@@ -602,7 +612,7 @@ def load_sql_to_pandas(token: str):
     Example:
         >>> result = load_sql_to_pandas('my_table')
         >>> print(result)
-        {'status': 200, 'data': '{"column1": [1, 2, 3], "column2": ["a", "b", "c"]}'}        
+        {'status': 200, 'data': '{"column1": [1, 2, 3], "column2": ["a", "b", "c"]}'}
     """
     conn = sqlite3.connect(os.path.join("database", "sql3.db"))
     status = 0
@@ -629,22 +639,25 @@ async def get_password(username):
     result = None
     try:
         # print("start")
-        cursor.execute("SELECT password_hash FROM users WHERE username = ?", (username,))
+        cursor.execute(
+            "SELECT password_hash FROM users WHERE username = ?", (username,)
+        )
 
         result = cursor.fetchall()
         # print(result)
-        conn.commit()        
+        conn.commit()
     except sqlite3.Error as e:
         print(f"get_password: The SQL statement failed with error: {e}")
     finally:
         if conn:
-            cursor.close()            
+            cursor.close()
     if result is not None:
         if len(result) > 0:
             return list(result[0])[0]
     else:
         return None
-    
+
+
 async def get_userid(username):
     conn = pool.connection()
     cursor = conn.cursor()
@@ -652,24 +665,28 @@ async def get_userid(username):
     try:
         cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
         result = cursor.fetchall()
-        conn.commit()        
+        conn.commit()
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
     finally:
         if conn:
-            cursor.close()            
+            cursor.close()
     if result is not None:
         if len(result) > 0:
             return list(result[0])[0]
     else:
         return None
-    
-async def add_user(userid,username, password, email):
+
+
+async def add_user(userid, username, password, email):
     conn = pool.connection()
     cursor = conn.cursor()
     status = 0
     try:
-        cursor.execute("INSERT INTO users (user_id, username, password_hash, email) VALUES (?,?,?,?)", (userid, username, password, email))
+        cursor.execute(
+            "INSERT INTO users (user_id, username, password_hash, email) VALUES (?,?,?,?)",
+            (userid, username, password, email),
+        )
         conn.commit()
         status = 200
     except sqlite3.Error as e:
@@ -679,6 +696,7 @@ async def add_user(userid,username, password, email):
         if conn:
             cursor.close()
     return status
+
 
 def create_project_():
     config = {
@@ -706,15 +724,13 @@ def create_project_():
     pro_name = config["name"].replace(" ", "")
     table_name = f"{pro_name}_{token}".replace(" ", "")
     print(f" Token: {token}, Table name: {table_name}")
-    create_table_sql = "CREATE TABLE {} (date_time TIMESTAMP,location TEXT);".format(table_name)
+    create_table_sql = "CREATE TABLE {} (date_time TIMESTAMP,location TEXT);".format(
+        table_name
+    )
     create_table_sql = ""
-    
+
     if config["available"] == "Weather Station":
-        
         for param in config["param"]:
             create_table_sql += columns_WMS[param] + ","
         create_table_sql = create_table_sql[:-1] + ");"
         print(create_table_sql)
-
-
-
