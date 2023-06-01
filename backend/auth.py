@@ -69,7 +69,13 @@ async def register(request: Request, user: User):
         user_id = secrets.token_hex(8)
         username = incomming["username"]
         hashed_password = get_password_hash(incomming["password"])
-        email_id = incomming["email"]
+        email_id = incomming["email"]        
+        stat = await get_userid(username)
+        if stat is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Username already exists",
+            )        
         await add_user(user_id, username, hashed_password, email_id)
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
@@ -84,7 +90,7 @@ async def register(request: Request, user: User):
 
 
 @router.post("/auth/login", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(request : Request, form_data: OAuth2PasswordRequestForm = Depends()):
     username = form_data.username
     password = form_data.password
     stored_hashed_password = await get_password(username)
