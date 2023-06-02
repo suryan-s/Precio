@@ -19,7 +19,7 @@ export default function PrettyWrapper({
             }}
           />
           <div className="relative z-20 flex items-center text-lg font-medium">
-            <Command className="mr-2 h-6 w-6" /> Precio
+            <Command className="mr-2 h-8 w-8" /> <p className="text-2xl">Precio</p>
           </div>
           <Suspense fallback={<div>Loading...</div>}>
             <Quote />
