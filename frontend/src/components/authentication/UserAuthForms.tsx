@@ -6,9 +6,10 @@ import { Icons } from "@/components/icons";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState, HTMLAttributes, SyntheticEvent } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
+import { Link } from "@/components/ui/Link";
 import { useLocalStorage } from "usehooks-ts";
-
+import { apiUrlBase } from "@/lib/config";
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 interface ResponseType {
@@ -42,7 +43,7 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
     });
     let response: Response | undefined;
     try {
-      response = await fetch("http://127.0.0.1:8000/auth/login", {
+      response = await fetch(apiUrlBase+"auth/login", {
         method: "POST",
         body: data,
       });
@@ -56,8 +57,10 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
       console.log("User logged in successfully.");
       setToken(json.access_token);
       setLocation("/");
+    } else if (response?.status === 401) {
+      setError("Invalid username or password.");
     } else {
-      setError("Incorrect username or password.");
+      setError("An error occurred in the server.");
     }
     setIsLoading(false);
   }
@@ -132,7 +135,7 @@ export function SignupForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true);
     let response: Response | undefined;
     try {
-      response = await fetch("http://localhost:8000/auth/register", {
+      response = await fetch(apiUrlBase+"auth/register", {
         method: "POST",
         body: JSON.stringify({
           username: (document.getElementById("username") as HTMLInputElement)
