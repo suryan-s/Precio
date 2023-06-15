@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,30 +19,36 @@ interface ProjectCardProps {
 }
 const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
+    <Card className="w-64">
+      <CardHeader className="flex flex-col pb-5">
+        <CardTitle className="break-words">{name}</CardTitle>
         <CardDescription>
           {status === "online" && (
             <>
-              <span className="font-black text-xl leading-3 text-green-600">
+              <span className="font-black text-2xl leading-3 text-green-600">
                 •
-              </span>
+              </span>{" "}
               Online
             </>
           )}
           {status === "offline" && (
             <>
-              <span className="font-black text-xl leading-3 text-gray-600">
+              <span className="font-black text-2xl leading-3 text-gray-600">
                 •
-              </span>
+              </span>{" "}
               Offline
             </>
           )}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <img src={image} width={200} height={200} alt="Project Image" />
+      <CardContent className="pt-0">
+        <img
+          className="rounded-sm"
+          src={image}
+          width={200}
+          height={200}
+          alt="Project Image"
+        />
       </CardContent>
     </Card>
   );
