@@ -1,6 +1,6 @@
 import { useLocalStorage } from "usehooks-ts";
 import { useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 
 import {
   Card,
@@ -19,38 +19,40 @@ interface ProjectCardProps {
 }
 const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
   return (
-    <Card className="w-64">
-      <CardHeader className="flex flex-col pb-5">
-        <CardTitle className="break-words">{name}</CardTitle>
-        <CardDescription>
-          {status === "online" && (
-            <>
-              <span className="font-black text-2xl leading-3 text-green-600">
-                •
-              </span>{" "}
-              Online
-            </>
-          )}
-          {status === "offline" && (
-            <>
-              <span className="font-black text-2xl leading-3 text-gray-600">
-                •
-              </span>{" "}
-              Offline
-            </>
-          )}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <img
-          className="rounded-sm"
-          src={image}
-          width={200}
-          height={200}
-          alt="Project Image"
-        />
-      </CardContent>
-    </Card>
+    <Link href={`/${encodeURIComponent(name)}`}>
+      <Card className="w-64 hover:shadow-lg transition-shadow duration-300 ease-in-out cursor-pointer">
+        <CardHeader className="flex flex-col pb-5">
+          <CardTitle className="break-words">{name}</CardTitle>
+          <CardDescription>
+            {status === "online" && (
+              <>
+                <span className="font-black text-2xl leading-3 text-green-600">
+                  •
+                </span>{" "}
+                Online
+              </>
+            )}
+            {status === "offline" && (
+              <>
+                <span className="font-black text-2xl leading-3 text-gray-600">
+                  •
+                </span>{" "}
+                Offline
+              </>
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <img
+            className="rounded-sm"
+            src={image}
+            width={200}
+            height={200}
+            alt="Project Image"
+          />
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 
