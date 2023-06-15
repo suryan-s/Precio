@@ -35,7 +35,7 @@ export default function Home() {
   return (
     <>
       <header>
-        <nav className="flex items-center justify-between flex-wrap bg-primary p-6 px-6 md:px-12">
+        <nav className="flex items-center justify-between flex-wrap bg-primary p-4 px-6 md:px-12">
           <div className="flex items-center flex-shrink-0 text-white mr-6">
             <Command className="mr-2 h-7 w-7" />
             <span className="font-semibold text-xl tracking-tight">Precio</span>
