@@ -15,7 +15,7 @@ export default function PrettyWrapper({
             className="absolute inset-0 bg-cover"
             style={{
               backgroundImage:
-                "url(https://images.unsplash.com/photo-1599138900450-3d06e89ad309?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
+                "url(https://images.unsplash.com/photo-1599138900450-3d06e89ad309?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&fm=jpg&w=1080&fit=max), linear-gradient(315deg, rgba(13,28,25,1) 0%, rgba(39,64,40,1) 23%, rgba(79,93,40,1) 50%, rgba(23,80,38,1) 100%)",
             }}
           />
           <div className="relative z-20 flex items-center text-lg font-medium">
