@@ -44,7 +44,7 @@ interface ProjectCardProps {
  */
 const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
   return (
-    <Card className="w-64 hover:shadow-lg relative transition-shadow duration-300 ease-in-out">
+    <Card className="hover:shadow-lg relative transition-shadow duration-300 ease-in-out">
       <Link href={`/${encodeURIComponent(name)}`}>
         <CardHeader className="flex flex-col pb-5 cursor-pointer">
           <CardTitle className="break-words">{name}</CardTitle>
@@ -109,7 +109,7 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
       </Popover>
       <CardContent className="pt-0">
         <img
-          className="rounded-sm"
+          className="rounded-sm object-cover"
           src={image}
           width={200}
           height={200}
@@ -147,7 +147,7 @@ export default function Home() {
       <Navbar />
       <div className="flex flex-col p-6 px-6 md:px-12 bg-zinc-100 min-h-[calc(100vh-5rem)]">
         <h1 className="text-4xl font-bold">Projects</h1>
-        <div className="mt-8 flex flex-wrap gap-8">
+        <div className="mt-8 grid gap-8 grid-automatic">
           <ProjectCard
             name="Project Name"
             status="offline"
