@@ -30,7 +30,10 @@ const Navbar = () => {
         </div>
         <div className="flex items-center flex-shrink-0 text-white gap-6">
           <Popover>
-            <PopoverTrigger className="text-white hover:bg-slate-800 transition-colors rounded-sm p-3">
+            <PopoverTrigger
+              title="Your account"
+              className="text-white hover:bg-slate-800 transition-colors rounded-sm p-3"
+            >
               <User />
             </PopoverTrigger>
             <PopoverContent>
@@ -38,7 +41,10 @@ const Navbar = () => {
             </PopoverContent>
           </Popover>
           <Popover>
-            <PopoverTrigger className="text-white hover:bg-slate-800 transition-colors rounded p-3">
+            <PopoverTrigger
+              title="Settings"
+              className="text-white hover:bg-slate-800 transition-colors rounded p-3"
+            >
               <Settings />
             </PopoverTrigger>
             <PopoverContent>Settings Controls</PopoverContent>
