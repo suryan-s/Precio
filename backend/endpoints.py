@@ -185,12 +185,6 @@ async def create_project_(config):
         )
     ]:
         print("Table created successfully.")
-        # settings = {}
-        # with open("settings.json", "r+") as content:
-        #     settings = json.load(content)
-        #     content.truncate(0)
-        #     settings["table_names"].append(table_name)
-        #     json.dump(settings, content)
         status = 200
         conn.commit()
     else:
@@ -202,7 +196,7 @@ async def create_project_(config):
     return status
 
 
-async def delete_project(project_id):
+async def delete_project(project_id, user_id):
     """
     Deletes a project table from the database and updates the settings file.
 
@@ -219,12 +213,12 @@ async def delete_project(project_id):
         Exception: For any other unexpected exceptions.
 
     """
-    delete_sql = """DELETE FROM projects WHERE project_id = ?;"""
+    delete_sql = """DELETE FROM projects WHERE project_id = ? AND user_id = ?;"""
     conn = pool.connection()
     status = 0
     cursor = conn.cursor()
     try:
-        val = cursor.execute(delete_sql, (project_id,))
+        val = cursor.execute(delete_sql, (project_id, user_id,))
         print("Deleted ", val)
         status = 200
     except sqlite3.Error as e:
@@ -497,7 +491,7 @@ async def get_table_names(user_id: str):
     try:
         c.execute(query, (user_id,))
         rows = c.fetchall()
-        result = json.dumps(rows)
+        result = rows
         conn.commit()
         status = 200
     except sqlite3.Error as e:
