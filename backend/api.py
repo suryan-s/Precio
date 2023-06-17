@@ -20,7 +20,7 @@ Exceptions:
 """
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.security import OAuth2PasswordBearer
-from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 
 from backend.auth import get_user_id_from_token
 
@@ -48,7 +48,7 @@ async def get_current_token(token: str = Depends(oauth2_scheme)):
     """
     if not token:
         raise HTTPException(
-            status_code = HTTP_401_UNAUTHORIZED,
+            status_code=HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing authorization token",
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -200,21 +200,20 @@ async def get_table(token: str = Depends(get_current_token)):
         A list of table names.
         :param token:
     """
-    try:
-        user_id = await get_user_id_from_token(token)
-        if user_id is None:
-            raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED,
-                detail="Invalid or missing authorization token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        result, status = await get_table_names(user_id)
-        return {"result": result, "status": status}
-    except Exception as error:
+    user_id = await get_user_id_from_token(token)
+    if user_id is None:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal Server Error"
-        ) from error
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing authorization token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    result, status = await get_table_names(user_id)
+    if result is None:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND, detail="No projects found"
+        )
+    else:
+        return {"result": result, "status": status}
 
 
 @router.get("/api/getLineGraph/{api_token}/{graph}")
