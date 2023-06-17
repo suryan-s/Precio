@@ -1,7 +1,7 @@
 import { useLocalStorage } from "usehooks-ts";
 import { useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import { fetchWithToken } from "@/lib/auth/utils";
+import { useFetchWithToken } from "@/lib/auth/utils";
 
 import {
   Card,
@@ -28,9 +28,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { Plus, MoreVerticalIcon, Settings2, Trash } from "lucide-react";
+import { MoreVerticalIcon, Settings2, Trash } from "lucide-react";
 
 import Navbar from "@/components/dashboard/Navbar";
+import AddProject from "@/components/dashboard/AddProject";
 
 interface ProjectCardProps {
   name: string;
@@ -121,22 +122,6 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
   );
 };
 
-const AddProject = () => {
-  return (
-    <Popover>
-      <PopoverTrigger
-        title="Add new..."
-        className="absolute bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4"
-      >
-        <Plus size={25} />
-      </PopoverTrigger>
-      <PopoverContent>
-        <div />
-      </PopoverContent>
-    </Popover>
-  );
-};
-
 export default function Home() {
   const [token] = useLocalStorage<string | null>("token", null);
   const [__, setLocation] = useLocation();
@@ -146,38 +131,34 @@ export default function Home() {
       setLocation("/Login");
     }
   }, [token]);
-  useEffect(() => {
-    fetchWithToken("api/getTableNames")
-      .then((res) => {
-        if (res.status === 401) {
-          setLocation("/Login");
-        }
-        console.log(res);
-        return res.json();
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch(() => {
-        setLocation("/Login");
-      });
-  }, []);
+  const [error, data, loading] = useFetchWithToken<{
+    status: number;
+    result: Array<[string, string]>;
+  }>("api/getTableNames");
+  console.log(error, data);
   return (
     <>
       <Navbar />
       <div className="flex flex-col p-6 px-6 md:px-12 bg-zinc-100 min-h-[calc(100vh-5rem)]">
         <h1 className="text-4xl font-bold">Projects</h1>
         <div className="mt-8 grid gap-8 grid-automatic">
-          <ProjectCard
-            name="Project Name"
-            status="offline"
-            image="https://picsum.photos/200"
-          />
-          <ProjectCard
-            name="Project Name"
-            status="online"
-            image="https://picsum.photos/200?random=1"
-          />
+          {data ? (
+            data.result.map(([name, id]) => (
+              <ProjectCard
+                name={name}
+                status="offline"
+                image={`https://picsum.photos/200?random=${id}`}
+                key={id}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full">
+              <h1 className="text-4xl font-bold">No Projects</h1>
+              <p className="text-gray-500">
+                Create a new project to get started!
+              </p>
+            </div>
+          )}
         </div>
         <AddProject />
       </div>
