@@ -28,9 +28,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { Plus, MoreVerticalIcon, Settings2, Trash } from "lucide-react";
+import { MoreVerticalIcon, Settings2, Trash } from "lucide-react";
 
 import Navbar from "@/components/dashboard/Navbar";
+import AddProject from "@/components/dashboard/AddProject";
 
 interface ProjectCardProps {
   name: string;
@@ -118,22 +119,6 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
         />
       </CardContent>
     </Card>
-  );
-};
-
-const AddProject = () => {
-  return (
-    <Popover>
-      <PopoverTrigger
-        title="Add new..."
-        className="absolute bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4"
-      >
-        <Plus size={25} />
-      </PopoverTrigger>
-      <PopoverContent>
-        <div />
-      </PopoverContent>
-    </Popover>
   );
 };
 
