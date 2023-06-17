@@ -109,9 +109,9 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
       </Popover>
       <CardContent className="pt-0">
         <img
-          className="rounded-sm object-cover"
+          className="rounded-sm object-cover w-full h-[200px]"
           src={image}
-          width={200}
+          // width={200}
           height={200}
           alt={`Image for ${name}`}
         />
