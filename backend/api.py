@@ -18,8 +18,11 @@ Exceptions:
 - HTTPException: Raised when an internal server error occurs.
 
 """
-from fastapi import APIRouter, HTTPException, Request
-from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
+from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi.security import OAuth2PasswordBearer
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_401_UNAUTHORIZED
+
+from backend.auth import get_user_id_from_token
 
 from backend.endpoints import (
     create_project,
@@ -31,8 +34,25 @@ from backend.endpoints import (
     get_table_names,
     predictBasic,
 )
+from backend.schemas import CreateProject
 
 router = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
+async def get_current_token(token: str = Depends(oauth2_scheme)):
+    """
+    Returns the current token.
+    :param token:
+    :return: token
+    """
+    if not token:
+        raise HTTPException(
+            status_code = HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing authorization token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return token
 
 
 @router.on_event("startup")
@@ -50,7 +70,7 @@ async def startup():
         None
     """
     await create_tables()
-    print("Startup complete")
+    # print("Startup complete")
 
 
 @router.post("/api/condevice")
@@ -99,7 +119,7 @@ async def connect() -> dict:
 
 
 @router.post("/api/createProject")
-async def create_table(request: Request) -> dict:
+async def create_table(request: Request, project: CreateProject, token: str = Depends(get_current_token)) -> dict:
     """
     Creates a new project table in the database.
 
@@ -111,19 +131,30 @@ async def create_table(request: Request) -> dict:
 
     Returns:
         A dictionary containing the status of the operation.
+        :param token:
+        :param request:
+        :param project: model for project
     """
     try:
+        user_id = await get_user_id_from_token(token)
+        if user_id is None:
+            raise HTTPException(
+                status_code=HTTP_401_UNAUTHORIZED,
+                detail="Invalid or missing authorization token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         incoming = await request.json()
-        status = await create_project(incoming)
+        status = await create_project(incoming, user_id)
         return {"status": status}
     except Exception as error:
-        raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-        ) from error
+        # raise HTTPException(
+        #     status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        # ) from error
+        print(error)
 
 
-@router.post("/api/deleteProject/{api_token}")
-async def delete_table(api_token: str):
+@router.post("/api/deleteProject/{project_id}")
+async def delete_table(project_id: str):
     """
     Deletes a project table from the database.
 
@@ -131,13 +162,13 @@ async def delete_table(api_token: str):
     It calls the `delete_project` function to delete the project table.
 
     Args:
-        api_token: The API token of the project table to be deleted.
+        project_id: The API token of the project table to be deleted.
 
     Returns:
         A dictionary containing the status of the operation.
     """
     try:
-        status = await delete_project(api_token)
+        status = await delete_project(project_id)
         print("Status: ", status)
         return {"status": status}
     except Exception as error:
@@ -147,7 +178,7 @@ async def delete_table(api_token: str):
 
 
 @router.get("/api/getTableNames")
-async def get_table():
+async def get_table(token: str = Depends(get_current_token)):
     """
     Retrieves the names of all project tables in the database.
 
@@ -159,13 +190,22 @@ async def get_table():
 
     Returns:
         A list of table names.
+        :param token:
     """
     try:
-        return await get_table_names()
+        user_id = await get_user_id_from_token(token)
+        if user_id is None:
+            raise HTTPException(
+                status_code=HTTP_401_UNAUTHORIZED,
+                detail="Invalid or missing authorization token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return await get_table_names(str(user_id))
     except Exception as error:
-        raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-        ) from error
+        # raise HTTPException(
+        #     status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        # ) from error
+        print(error)
 
 
 @router.get("/api/getLineGraph/{api_token}/{graph}")

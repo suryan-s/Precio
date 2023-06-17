@@ -14,6 +14,12 @@ class Token(BaseModel):
     message: str
 
 
+class CreateProject(BaseModel):
+    project_name: str
+    project_description: str
+    project_type: str
+
+
 class WMSData(BaseModel):
     maxtempC: int
     mintempC: int
