@@ -237,6 +237,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             data={"sub": user_id}, expires_delta=access_token_expires
         )
         # print("userid from token: ", get_user_id_from_token(access_token))
+        print(access_token)
         return {"access_token": access_token, "token_type": "bearer", "status": 200, "message": "Login successful"}
 
     raise HTTPException(
