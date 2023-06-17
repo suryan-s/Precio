@@ -123,7 +123,10 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
 const AddProject = () => {
   return (
     <Popover>
-      <PopoverTrigger className="absolute bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4">
+      <PopoverTrigger
+        title="Add new..."
+        className="absolute bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4"
+      >
         <Plus size={25} />
       </PopoverTrigger>
       <PopoverContent>
