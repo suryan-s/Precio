@@ -19,7 +19,8 @@ router = APIRouter()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = secrets.token_hex(32)
+# SECRET_KEY = secrets.token_hex(32)
+SECRET_KEY = "ThisIsASecretKeyAndShouldBeChangedOnProduction"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -112,6 +113,17 @@ async def get_user_id_from_token(token: str):
     except JWTError:
         # Invalid token format or signature
         print("JWTError occurred at get_user_id_from_token")
+        return None
+    except ValueError:
+        # Invalid token format or signature
+        print("ValueError occurred at get_user_id_from_token")
+        return None
+    except TypeError:
+        # Invalid token format or signature
+        print("TypeError occurred at get_user_id_from_token")
+        return None
+    except Exception as error:
+        print("Exception occurred at get_user_id_from_token: ", error)
         return None
 
 
