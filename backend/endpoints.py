@@ -185,12 +185,6 @@ async def create_project_(config):
         )
     ]:
         print("Table created successfully.")
-        # settings = {}
-        # with open("settings.json", "r+") as content:
-        #     settings = json.load(content)
-        #     content.truncate(0)
-        #     settings["table_names"].append(table_name)
-        #     json.dump(settings, content)
         status = 200
         conn.commit()
     else:
@@ -497,7 +491,7 @@ async def get_table_names(user_id: str):
     try:
         c.execute(query, (user_id,))
         rows = c.fetchall()
-        result = json.dumps(rows)
+        result = rows
         conn.commit()
         status = 200
     except sqlite3.Error as e:

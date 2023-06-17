@@ -194,6 +194,7 @@ async def get_table(token: str = Depends(get_current_token)):
         A list of table names.
         :param token:
     """
+    status = 500
     try:
         user_id = await get_user_id_from_token(token)
         if user_id is None:
@@ -202,12 +203,14 @@ async def get_table(token: str = Depends(get_current_token)):
                 detail="Invalid or missing authorization token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        return await get_table_names(str(user_id))
+        result, status = await get_table_names(user_id)
+        return {"result": result, "status": status}
     except Exception as error:
         # raise HTTPException(
         #     status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
         # ) from error
         print(error)
+        return {"status": status}
 
 
 @router.get("/api/getLineGraph/{api_token}/{graph}")
