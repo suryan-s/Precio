@@ -224,9 +224,6 @@ async def delete_project(project_id, user_id):
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
-    except Exception as e:
-        print(f"Exception occurred at delete project with error: {e}")
-        status = 500
     conn.commit()
     if conn:
         cursor.close()
