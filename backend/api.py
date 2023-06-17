@@ -133,24 +133,22 @@ async def create_table(request: Request, project: CreateProject, token: str = De
         A dictionary containing the status of the operation.
         :param token:
         :param request:
-        :param project: model for project
+        :param project: Model for project
     """
-    try:
-        user_id = await get_user_id_from_token(token)
-        if user_id is None:
-            raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED,
-                detail="Invalid or missing authorization token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        incoming = await request.json()
-        status = await create_project(incoming, user_id)
-        return {"status": status}
-    except Exception as error:
-        # raise HTTPException(
-        #     status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-        # ) from error
-        print(error)
+    user_id = await get_user_id_from_token(token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing authorization token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    incoming = await request.json()
+    status = await create_project(incoming, user_id)
+    if status == 500:
+        raise HTTPException(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        )
+    return {"status": status}
 
 
 @router.post("/api/deleteProject/{project_id}")
@@ -169,20 +167,19 @@ async def delete_table(project_id: str, token: str = Depends(get_current_token))
         :param project_id:
         :param token:
     """
-    try:
-        user_id = await get_user_id_from_token(token)
-        if user_id is None:
-            raise HTTPException(
+    user_id = await get_user_id_from_token(token)
+    if user_id is None:
+        raise HTTPException(
                 status_code=HTTP_401_UNAUTHORIZED,
                 detail="Invalid or missing authorization token",
                 headers={"WWW-Authenticate": "Bearer"},
-            )
-        status = await delete_project(project_id, user_id)
-        return {"status": status}
-    except Exception as error:
+        )
+    status = await delete_project(project_id, user_id)
+    if status == 500:
         raise HTTPException(
-            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
-        ) from error
+                status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        )
+    return {"status": status}
 
 
 @router.get("/api/getTableNames")
