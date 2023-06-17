@@ -131,7 +131,10 @@ export default function Home() {
       setLocation("/Login");
     }
   }, [token]);
-  const [error, data, loading] = useFetchWithToken("api/getTableNames");
+  const [error, data, loading] = useFetchWithToken<{
+    status: number;
+    result: Array<[string, string]>;
+  }>("api/getTableNames");
   console.log(error, data);
   return (
     <>
@@ -139,16 +142,23 @@ export default function Home() {
       <div className="flex flex-col p-6 px-6 md:px-12 bg-zinc-100 min-h-[calc(100vh-5rem)]">
         <h1 className="text-4xl font-bold">Projects</h1>
         <div className="mt-8 grid gap-8 grid-automatic">
-          <ProjectCard
-            name="Project Name"
-            status="offline"
-            image="https://picsum.photos/200"
-          />
-          <ProjectCard
-            name="Project Name"
-            status="online"
-            image="https://picsum.photos/200?random=1"
-          />
+          {data ? (
+            data.result.map(([name, id]) => (
+              <ProjectCard
+                name={name}
+                status="offline"
+                image={`https://picsum.photos/200?random=${id}`}
+                key={id}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full">
+              <h1 className="text-4xl font-bold">No Projects</h1>
+              <p className="text-gray-500">
+                Create a new project to get started!
+              </p>
+            </div>
+          )}
         </div>
         <AddProject />
       </div>

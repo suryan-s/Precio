@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import {
   Popover,
   PopoverTrigger,
@@ -23,7 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCallback, useState } from "react";
+import { Icons } from "../icons";
+
+import { fetchWithToken } from "@/lib/auth/utils";
+import { useLocation } from "wouter";
 
 const ImportProject = () => {
   return (
@@ -45,12 +49,47 @@ const ImportProject = () => {
 };
 const AddNewProject = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [selectValue, setSelectValue] = useState<string | undefined>(undefined);
+  const [, setLocation] = useLocation();
   const submitHandler = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setLoading(true);
+      const obj = {
+        project_name: e.currentTarget.projectName.value,
+        project_description: e.currentTarget.projectDescription.value,
+        project_type: selectValue,
+      };
+      console.log(JSON.stringify(obj));
+      console.log(obj);
+      fetchWithToken("api/createProject", {
+        method: "POST",
+        body: JSON.stringify(obj),
+      })
+        .then((res) => {
+          console.log(res);
+          setLoading(false);
+          return res.json();
+        })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.status === 401) setLocation("/login");
+          if (
+            err.message === "Token expired" ||
+            err.message === "No token found"
+          ) {
+            localStorage.removeItem("token");
+            setLocation("/login");
+          }
+          setLoading(false);
+        });
       setOpen(false);
     },
-    [setOpen]
+    [setOpen, setLoading, selectValue]
   );
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -91,7 +130,7 @@ const AddNewProject = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="projectType">Project Type*</Label>
-              <Select required>
+              <Select required onValueChange={setSelectValue}>
                 <SelectTrigger className="col-span-3" id="projectType">
                   <SelectValue placeholder="Project Type" />
                 </SelectTrigger>
@@ -106,7 +145,13 @@ const AddNewProject = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Create Project</Button>
+            <Button type="submit">
+              {loading ? (
+                <Icons.spinner className="animate-spin" />
+              ) : (
+                "Create Project"
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

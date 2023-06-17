@@ -43,7 +43,7 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
     });
     let response: Response | undefined;
     try {
-      response = await fetch(apiUrlBase+"auth/login", {
+      response = await fetch(apiUrlBase + "auth/login", {
         method: "POST",
         body: data,
       });
@@ -135,7 +135,7 @@ export function SignupForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true);
     let response: Response | undefined;
     try {
-      response = await fetch(apiUrlBase+"auth/register", {
+      response = await fetch(apiUrlBase + "auth/register", {
         method: "POST",
         body: JSON.stringify({
           username: (document.getElementById("username") as HTMLInputElement)

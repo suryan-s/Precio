@@ -19,11 +19,15 @@ export const fetchWithToken = async (
     ...options,
     headers: {
       ...options?.headers,
-      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${JSON.parse(token)}`,
     },
   });
   if (res.status === 401) {
     throw new Error("Token expired");
+  }
+  if (res.status === 500) {
+    throw new Error("Server error");
   }
   return res;
 };
@@ -42,10 +46,15 @@ export const useFetchWithToken = <T = any>(
   const [loading, setLoading] = useState<boolean>(true);
   const [, setLocation] = useLocation();
   useEffect(() => {
-    fetchWithToken(url, options)
+    const abortController = new AbortController();
+    fetchWithToken(url, {
+      ...options,
+      signal: abortController.signal,
+    })
       .then((res) => res.json())
       .then((data) => {
         setLoading(false);
+        console.log(data);
         setData(data);
       })
       .catch((e) => {
@@ -56,6 +65,9 @@ export const useFetchWithToken = <T = any>(
           setLocation("/login");
         }
       });
+    return () => {
+      abortController.abort();
+    };
   }, [url, options]);
   return [error, data, loading];
 };
