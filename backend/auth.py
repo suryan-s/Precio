@@ -122,9 +122,6 @@ async def get_user_id_from_token(token: str):
         # Invalid token format or signature
         print("TypeError occurred at get_user_id_from_token")
         return None
-    except Exception as error:
-        print("Exception occurred at get_user_id_from_token: ", error)
-        return None
 
 
 def check_user(request: Request):
