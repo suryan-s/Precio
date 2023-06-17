@@ -202,7 +202,7 @@ async def create_project_(config):
     return status
 
 
-async def delete_project(project_id):
+async def delete_project(project_id, user_id):
     """
     Deletes a project table from the database and updates the settings file.
 
@@ -219,12 +219,12 @@ async def delete_project(project_id):
         Exception: For any other unexpected exceptions.
 
     """
-    delete_sql = """DELETE FROM projects WHERE project_id = ?;"""
+    delete_sql = """DELETE FROM projects WHERE project_id = ? AND user_id = ?;"""
     conn = pool.connection()
     status = 0
     cursor = conn.cursor()
     try:
-        val = cursor.execute(delete_sql, (project_id,))
+        val = cursor.execute(delete_sql, (project_id, user_id,))
         print("Deleted ", val)
         status = 200
     except sqlite3.Error as e:

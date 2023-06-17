@@ -154,7 +154,7 @@ async def create_table(request: Request, project: CreateProject, token: str = De
 
 
 @router.post("/api/deleteProject/{project_id}")
-async def delete_table(project_id: str):
+async def delete_table(project_id: str, token: str = Depends(get_current_token)):
     """
     Deletes a project table from the database.
 
@@ -166,10 +166,12 @@ async def delete_table(project_id: str):
 
     Returns:
         A dictionary containing the status of the operation.
+        :param project_id:
+        :param token:
     """
     try:
-        status = await delete_project(project_id)
-        print("Status: ", status)
+        user_id = await get_user_id_from_token(token)
+        status = await delete_project(project_id, user_id)
         return {"status": status}
     except Exception as error:
         raise HTTPException(
