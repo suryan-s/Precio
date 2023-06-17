@@ -1,6 +1,7 @@
 import { useLocalStorage } from "usehooks-ts";
 import { useEffect } from "react";
 import { useLocation, Link } from "wouter";
+import { fetchWithToken } from "@/lib/auth/utils";
 
 import {
   Card,
@@ -145,6 +146,22 @@ export default function Home() {
       setLocation("/Login");
     }
   }, [token]);
+  useEffect(() => {
+    fetchWithToken("api/getTableNames")
+      .then((res) => {
+        if (res.status === 401) {
+          setLocation("/Login");
+        }
+        console.log(res);
+        return res.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch(() => {
+        setLocation("/Login");
+      });
+  }, []);
   return (
     <>
       <Navbar />
