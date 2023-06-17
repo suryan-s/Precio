@@ -36,23 +36,26 @@ export const fetchWithToken = async (
 export const useFetchWithToken = <T = any>(
   url: string,
   options?: RequestInit
-): [Error | undefined, T | undefined] => {
+): [Error | undefined, T | undefined, boolean] => {
   const [data, setData] = useState<any>();
   const [error, setError] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(true);
   const [, setLocation] = useLocation();
   useEffect(() => {
     fetchWithToken(url, options)
       .then((res) => res.json())
       .then((data) => {
+        setLoading(false);
         setData(data);
       })
       .catch((e) => {
         setError(e);
+        setLoading(false);
         if (e.message === "Token expired" || e.message === "No token found") {
           localStorage.removeItem("token");
           setLocation("/login");
         }
       });
   }, [url, options]);
-  return [error, data];
+  return [error, data, loading];
 };

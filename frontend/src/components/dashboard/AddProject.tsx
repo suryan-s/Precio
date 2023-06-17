@@ -69,11 +69,13 @@ const AddNewProject = () => {
         <form onSubmit={submitHandler}>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectName">Project Name</Label>
+              <Label htmlFor="projectName">Project Name*</Label>
               <Input
                 id="projectName"
                 placeholder="A cool name..."
+                minLength={3}
                 className="col-span-3"
+                required
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -83,12 +85,13 @@ const AddNewProject = () => {
               <Input
                 id="projectDescription"
                 placeholder="An amazing project description."
+                minLength={3}
                 className="col-span-3"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectType">Project Type</Label>
-              <Select>
+              <Label htmlFor="projectType">Project Type*</Label>
+              <Select required>
                 <SelectTrigger className="col-span-3" id="projectType">
                   <SelectValue placeholder="Project Type" />
                 </SelectTrigger>
