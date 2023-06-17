@@ -480,7 +480,7 @@ async def get_table_names(user_id: str):
                 - 200: Success.
                 - 500: Error encountered while executing the SQL statement.
     """
-    query = """SELECT project_name, project_id from projects WHERE user_id = ?;"""
+    query = """SELECT project_name, project_id, project_status  from projects WHERE user_id = ?;"""
     conn = pool.connection()
     status = 0
     result = None

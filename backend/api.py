@@ -133,7 +133,7 @@ async def create_table(request: Request, project: CreateProject, token: str = De
         A dictionary containing the status of the operation.
         :param token:
         :param request:
-        :param project: Model for project
+        :param project: Model for a project
     """
     user_id = await get_user_id_from_token(token)
     if user_id is None:
