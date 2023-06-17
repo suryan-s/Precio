@@ -96,6 +96,25 @@ def is_token_expired(token: str):
         return True
 
 
+async def get_user_id_from_token(token: str):
+    """
+    Gets the user ID from the provided token.
+
+    Args:
+        token (str): The token to be decoded.
+
+    Returns:
+        str: The user ID decoded from the token.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload.get("sub")
+    except JWTError:
+        # Invalid token format or signature
+        print("JWTError occurred at get_user_id_from_token")
+        return None
+
+
 def check_user(request: Request):
     """Checks the validity of the user's token from the request headers.
 
@@ -107,7 +126,7 @@ def check_user(request: Request):
         401 if the token is missing or expired.
     """
     token = request.headers.get("Authorization")
-    print(token)
+    # print(token)
     if not token or is_token_expired(token):
         return 401
     return 200
@@ -163,6 +182,7 @@ async def register(request: Request, user: User):
         access_token = create_access_token(
             data={"sub": user_id}, expires_delta=access_token_expires
         )
+        # get_user_id_from_token(access_token)
         return {
             "access_token": access_token,
             "token_type": "bearer",
@@ -202,9 +222,8 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
     username = form_data.username
     password = form_data.password
     stored_hashed_password = await get_password(username)
-    print(stored_hashed_password)
     if stored_hashed_password is None or not verify_password(
-        password, stored_hashed_password
+            password, stored_hashed_password
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -217,6 +236,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
         access_token = create_access_token(
             data={"sub": user_id}, expires_delta=access_token_expires
         )
+        # print("userid from token: ", get_user_id_from_token(access_token))
         return {"access_token": access_token, "token_type": "bearer", "status": 200, "message": "Login successful"}
 
     raise HTTPException(

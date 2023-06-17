@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import secrets
@@ -6,27 +6,6 @@ import sqlite3
 
 import pandas as pd
 from dbutils.pooled_db import PooledDB
-
-# import numpy as np
-# import pandas as pd
-# from keras.callbacks import EarlyStopping, ModelCheckpoint
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import LabelEncoder, StandardScaler
-# from keras.models import load_model
-
-# from tensorflow.keras.layers import Dense
-# from tensorflow.keras.models import Sequential
-
-# {
-#     "id":"string","
-#     "name":"Agro",
-#     "type":"Arable",
-#     "available":"PMS",
-#     "stationParameters":["Temperature","Humidity","Pressure","Wind","UV","Light","Rain","Battery Status"],
-#     "pmsParameters":["Soil Moisture","Soil Temperature/Humidity"]
-# }
-
-# model = load_model(os.path.join('model','best_pretemp.h5'))
 
 # Create a connection pool
 pool = PooledDB(
@@ -78,10 +57,7 @@ async def create_tables():
     If the tables already exist, the function does not modify them.
 
     Args:
-        None
-
     Returns:
-        None
     """
     conn = pool.connection()
     cursor = conn.cursor()
@@ -104,6 +80,7 @@ async def create_tables():
             project_description TEXT,
             project_type TEXT,
             user_id TEXT,
+            project_status TEXT,
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
     """
@@ -136,7 +113,7 @@ async def create_tables():
     cursor.close()
 
 
-async def create_project(config):
+async def create_project_(config):
     """
     Create a new project table in the database based on the provided configuration.
 
@@ -225,12 +202,12 @@ async def create_project(config):
     return status
 
 
-async def delete_project(token):
+async def delete_project(project_id):
     """
     Deletes a project table from the database and updates the settings file.
 
     Args:
-        token (str): The token identifying the project table to delete.
+        project_id (str): The token identifying the project table to delete.
 
     Returns:
         int: The status code indicating the result of the operation.
@@ -242,24 +219,19 @@ async def delete_project(token):
         Exception: For any other unexpected exceptions.
 
     """
-    delete_sql = """DROP TABLE {};""".format(token)
+    delete_sql = """DELETE FROM projects WHERE project_id = ?;"""
     conn = pool.connection()
     status = 0
     cursor = conn.cursor()
     try:
-        val = cursor.execute(delete_sql)
+        val = cursor.execute(delete_sql, (project_id,))
         print("Deleted ", val)
-        # with open("settings.json", "r+") as content:
-        #     data = json.load(content)
-        #     content.truncate(0)
-        #     data["table_names"].remove(token)
-        #     json.dump(data, content)
         status = 200
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
     except Exception as e:
-        print(f"Exception occured at delete project with error: {e}")
+        print(f"Exception occurred at delete project with error: {e}")
         status = 500
     conn.commit()
     if conn:
@@ -330,7 +302,7 @@ def insert_into_table_WMS(datapoints, token):
         cursor.execute(
             insert_data_sql,
             (
-                datetime.datetime.now(),
+                datetime.now(),
                 datapoints["maxtempC"],
                 datapoints["mintempC"],
                 datapoints["uvIndex"],
@@ -506,12 +478,9 @@ async def get_line_data(token, parameter):
     return result, status
 
 
-async def get_table_names():
+async def get_table_names(user_id: str):
     """
-    Retrieves the names of tables from the SQLite database.
-
-    Executes a SQL statement to fetch the names of tables from the 'sqlite_master' system table.
-    The retrieved table names are returned as a JSON string.
+    Retrieves the names of the projects added into the Projects table.
 
     Returns:
         tuple: A tuple containing the following elements:
@@ -520,13 +489,13 @@ async def get_table_names():
                 - 200: Success.
                 - 500: Error encountered while executing the SQL statement.
     """
-    table_names = """SELECT name FROM sqlite_master WHERE type='table';"""
+    query = """SELECT project_name, project_id from projects WHERE user_id = ?;"""
     conn = pool.connection()
     status = 0
     result = None
     c = conn.cursor()
     try:
-        c.execute(table_names)
+        c.execute(query, (user_id,))
         rows = c.fetchall()
         result = json.dumps(rows)
         conn.commit()
@@ -677,8 +646,15 @@ def get_userid(username):
     return result
 
 
-
 async def add_user(userid, username, password, email):
+    """
+    Adds a new user to the database.
+    :param userid:
+    :param username:
+    :param password: Password of the user
+    :param email: Email of the user
+    :return: status code: 200 if successful, 409 if user already exists, 500 if error
+    """
     conn = pool.connection()
     cursor = conn.cursor()
     status = 0
@@ -702,39 +678,38 @@ async def add_user(userid, username, password, email):
     return status
 
 
-def create_project_():
-    config = {
-        "name": "Home",
-        "type": "Arable",
-        "available": "Weather Station",
-        "param": [
-            "Temperature",
-            "Humidity",
-            "Pressure",
-            "UV",
-            "Light",
-            "Visibility",
-            "WindSpd",
-            "WindDir",
-            "Precipitation",
-            "Battery",
-            "Location",
-            "Status",
-            "Update",
-        ],
-    }
+async def create_project(config, user_id: str):
+    """
+    Creates a new project in the database.
+    :param config: Contains the configuration for the project.
+    :param user_id: The user id of the user creating the project from the token.
+    :return: status code
+    """
+    # config = {
+    #     "project_name": "Home",
+    #     "project_description": "Home weather station",
+    #     "project_type": "Custom",
+    # }
     status = 500
-    token = secrets.token_hex(5)
-    pro_name = config["name"].replace(" ", "")
-    table_name = f"{pro_name}_{token}".replace(" ", "")
-    print(f" Token: {token}, Table name: {table_name}")
-    create_table_sql = "CREATE TABLE {} (date_time TIMESTAMP,location TEXT);".format(
-        table_name
-    )
-    create_table_sql = ""
-
-    if config["available"] == "Weather Station":
-        for param in config["param"]:
-            create_table_sql += columns_WMS[param] + ","
-        create_table_sql = create_table_sql[:-1] + ");"
-        print(create_table_sql)
+    pro_id = secrets.token_hex(8)
+    pro_name = config["project_name"]
+    pro_desc = config["project_description"]
+    pro_type = config["project_type"]
+    pro_created = datetime.now()
+    pro_status = "Active"
+    conn = pool.connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO projects (project_id, project_name, project_description, project_type, project_created, project_status, user_id) VALUES (?,?,?,?,?,?,?)",
+            (pro_id, pro_name, pro_desc, pro_type, pro_created, pro_status, user_id),
+        )
+        conn.commit()
+        status = 200
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            cursor.close()
+    return status
