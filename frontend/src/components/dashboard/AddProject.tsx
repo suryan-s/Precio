@@ -28,6 +28,7 @@ import { Icons } from "../icons";
 
 import { fetchWithToken } from "@/lib/auth/utils";
 import { useLocation } from "wouter";
+import { useProjectStore } from "@/lib/stores/projectStore";
 
 const ImportProject = () => {
   return (
@@ -52,13 +53,16 @@ const AddNewProject = () => {
   const [loading, setLoading] = useState(false);
   const [selectValue, setSelectValue] = useState<string | undefined>(undefined);
   const [, setLocation] = useLocation();
+  const addProject = useProjectStore((state) => state.addProject);
   const submitHandler = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setLoading(true);
+      const pname = e.currentTarget.projectName.value;
+      const pdesc = e.currentTarget.projectDescription.value;
       const obj = {
-        project_name: e.currentTarget.projectName.value,
-        project_description: e.currentTarget.projectDescription.value,
+        project_name: pname,
+        project_description: pdesc,
         project_type: selectValue,
       };
       console.log(JSON.stringify(obj));
@@ -74,6 +78,7 @@ const AddNewProject = () => {
         })
         .then((res) => {
           console.log(res);
+          addProject([pname, `${Math.random()}`]);
         })
         .catch((err) => {
           console.log(err);
@@ -164,7 +169,7 @@ const AddProject = () => {
     <Popover>
       <PopoverTrigger
         title="Add new..."
-        className="absolute bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4"
+        className="fixed bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4"
       >
         <Plus size={25} />
       </PopoverTrigger>
