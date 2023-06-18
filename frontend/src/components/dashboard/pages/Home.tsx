@@ -21,7 +21,7 @@ export default function Home() {
       setLocation("/Login");
     }
   }, [token]);
-  const [error, data, loading] = useFetchWithToken<{
+  const [error, data] = useFetchWithToken<{
     status: number;
     result: Array<[string, string]>;
   }>("api/getTableNames");
