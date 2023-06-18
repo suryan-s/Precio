@@ -9,11 +9,11 @@ Precio is a comprehensive solution designed to assist modern farmers in optimizi
 
 ## Purpose
 
-Precio is an open-source software tool for monitoring, automating and visualizing farming data. It provides real-time data analysis and insights of farming, enabling informed decision-making and improving farming efficiency. Precio includes third-party integration and is designed to be user-friendly, optimizing resource usage, reducing waste, and increasing productivity.
+Precio is an open-source software tool for monitoring, automating and visualizing farming data. It provides real-time data analysis and insights into farming, enabling informed decision-making and improving farming efficiency. Precio includes third-party integration and is designed to be user-friendly, optimizing resource usage, reducing waste, and increasing productivity.
 
 ## Audience
 
-This application is intended for any agricultural enthusiast and developers looking forward for contributing into precision farming applications.
+This application is intended for any agricultural enthusiast and developers looking forward to contributing to precision farming applications.
 
 </br>
 <hr/>
@@ -22,10 +22,10 @@ This application is intended for any agricultural enthusiast and developers look
 
 - Clone the repository :\
   `git clone [https://github.com/suryan-s/Precio](https://github.com/suryan-s/Precio)`
-- Run setup.py in the main directory to create virtual environment, install packages from requirements.txt and build the static files for the frontend:\
+- Run setup.py in the main directory to create a virtual environment, install packages from requirements.txt and build the static files for the frontend:\
   `python setup.py`
-- Run application by:\
-  `uvicorn main:app --port 8000 --host 127.0.0.1`
+- Run the application by:\
+  `python main.py`
 </br>
 
 <hr/>
@@ -100,7 +100,7 @@ Precio
 - Arduino IDE
 - Node.js 16.15.4 or higher
 - Libraries used:
-  - Python: numpy, pandas, tensorflow, keras, uvicorn, fastapi, scikit-learn
+  - Python: numpy, pandas, Tensorflow, Keras, uvicorn, fastapi, scikit-learn
   - Svelte, vite, svelte-spa-router
   - IBM Carbon Design System
   - NanoID
@@ -146,7 +146,7 @@ Precio offers the following features:
 
 ## Current Status
 
-- [x] Create project and organise projects.
+- [x] Create projects and organise projects.
 - [x] Support for Arable farming.
 - [x] Visualization dashboard.
 - [x] Integration with Arduino with hardware and software support for WMS.
@@ -167,13 +167,13 @@ To start contributing to the project, clone the repository into your local syste
 https://github.com/suryan-s/Precio.git
 ```
 
-Before cloning the repository, make sure to navigate to the working subdirectory of your command line interface and ensure that no folder with same name exists. Other ways to clone the repository includes using a password protected SSH key, or by using [Git CLI](https://cli.github.com/). The changes may additionally be performed by opening this repo using [GitHub Desktop](https://desktop.github.com/)
+Before cloning the repository, make sure to navigate to the working subdirectory of your command line interface and ensure that no folder with the same name exists. Other ways to clone the repository include using a password-protected SSH key, or by using [Git CLI](https://cli.github.com/). The changes may additionally be performed by opening this repo using [GitHub Desktop](https://desktop.github.com/)
 
 ## Submitting a Pull Request
 
 Before opening a Pull Request, it is recommended to have a look at the full contributing page to make sure your code complies with all the pull request guidelines.
 
-Navigate to this subdirectory, & check status of all files that were altered (red) by running the below code in Git Bash:
+Navigate to this subdirectory, & check the status of all files that were altered (red) by running the below code in Git Bash:
 
 ```
   git status
@@ -182,7 +182,7 @@ Navigate to this subdirectory, & check status of all files that were altered (re
 Stage all your files that are to be pushed into your pull request. This can be done in two ways - stage all or some files:
 
 ```
-  git add .            // adds every single file that shows up red when running git status
+  git add .            // adds every single file that shows up red when running the git status
 ```
 
 ```
