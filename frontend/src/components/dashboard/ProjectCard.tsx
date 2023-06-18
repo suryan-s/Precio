@@ -90,7 +90,7 @@ const ProjectCard = ({ name, status, image, id }: ProjectCardProps) => {
   );
   return (
     <Card className="hover:shadow-lg relative transition-shadow duration-300 ease-in-out">
-      <Link href={`/${encodeURIComponent(name)}`}>
+      <Link href={`/${encodeURIComponent(id)}`}>
         <CardHeader className="flex flex-col pb-5 cursor-pointer">
           <CardTitle className="break-words">{name}</CardTitle>
           <CardDescription>

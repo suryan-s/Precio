@@ -77,8 +77,8 @@ const AddNewProject = () => {
           return res.json();
         })
         .then((res) => {
-          console.log(res);
-          addProject([pname, `${Math.random()}`]);
+          if (res.status === 401) setLocation("/login");
+          addProject([pname, res.project_id]);
         })
         .catch((err) => {
           console.log(err);
