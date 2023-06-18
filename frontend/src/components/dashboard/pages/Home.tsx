@@ -2,6 +2,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useFetchWithToken } from "@/lib/auth/utils";
+import { useProjectStore } from "@/lib/stores/projectStore";
 
 import {
   Card,
@@ -125,6 +126,10 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
 export default function Home() {
   const [token] = useLocalStorage<string | null>("token", null);
   const [__, setLocation] = useLocation();
+  const [projectStore, setProjectStore] = useProjectStore((state) => [
+    state.projectStore,
+    state.setProjectStore,
+  ]);
 
   useEffect(() => {
     if (token === null) {
@@ -135,6 +140,11 @@ export default function Home() {
     status: number;
     result: Array<[string, string]>;
   }>("api/getTableNames");
+  useEffect(() => {
+    if (data) {
+      setProjectStore(data);
+    }
+  }, [data]);
   console.log(error, data);
   return (
     <>
@@ -142,8 +152,8 @@ export default function Home() {
       <div className="flex flex-col p-6 px-6 md:px-12 bg-zinc-100 min-h-[calc(100vh-5rem)]">
         <h1 className="text-4xl font-bold">Projects</h1>
         <div className="mt-8 grid gap-8 grid-automatic">
-          {data ? (
-            data.result.map(([name, id]) => (
+          {projectStore ? (
+            projectStore.result.map(([name, id]) => (
               <ProjectCard
                 name={name}
                 status="offline"
