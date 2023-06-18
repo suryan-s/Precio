@@ -26,10 +26,23 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
 import { Icons } from "@/components/icons";
 import { fetchWithToken } from "@/lib/auth/utils";
 import { useCallback, useState } from "react";
 import { useProjectStore } from "@/lib/stores/projectStore";
+
+export const ProjectCardSkeleton = () => {
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <Skeleton className="w-full h-6 rounded-sm bg-slate-300" />
+      <Skeleton className="w-full h-6 rounded-sm bg-slate-300" />
+      <Skeleton className="w-full h-48 rounded-sm bg-slate-300" />
+    </div>
+  );
+};
+
 interface ProjectCardProps {
   name: string;
   status: "online" | "offline";
@@ -77,7 +90,7 @@ const ProjectCard = ({ name, status, image, id }: ProjectCardProps) => {
   );
   return (
     <Card className="hover:shadow-lg relative transition-shadow duration-300 ease-in-out">
-      <Link href={`/${encodeURIComponent(name)}`}>
+      <Link href={`/${encodeURIComponent(id)}`}>
         <CardHeader className="flex flex-col pb-5 cursor-pointer">
           <CardTitle className="break-words">{name}</CardTitle>
           <CardDescription>

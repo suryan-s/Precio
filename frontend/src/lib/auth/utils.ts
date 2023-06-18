@@ -47,11 +47,14 @@ export const useFetchWithToken = <T = any>(
   const [, setLocation] = useLocation();
   useEffect(() => {
     const abortController = new AbortController();
+    setLoading(true);
     fetchWithToken(url, {
       ...options,
       signal: abortController.signal,
     })
-      .then((res) => res.json())
+      .then((res) => {
+        return res.json();
+      })
       .then((data) => {
         setLoading(false);
         console.log(data);
@@ -60,6 +63,9 @@ export const useFetchWithToken = <T = any>(
       .catch((e) => {
         setError(e);
         setLoading(false);
+        if (e.message === "The user aborted a request.") {
+          setLoading(true);
+        }
         if (e.message === "Token expired" || e.message === "No token found") {
           localStorage.removeItem("token");
           setLocation("/login");

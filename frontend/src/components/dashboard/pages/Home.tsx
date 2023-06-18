@@ -6,7 +6,9 @@ import { useProjectStore } from "@/lib/stores/projectStore";
 
 import Navbar from "@/components/dashboard/Navbar";
 import AddProject from "@/components/dashboard/AddProject";
-import ProjectCard from "@/components/dashboard/ProjectCard";
+import ProjectCard, {
+  ProjectCardSkeleton,
+} from "@/components/dashboard/ProjectCard";
 
 export default function Home() {
   const [token] = useLocalStorage<string | null>("token", null);
@@ -21,7 +23,7 @@ export default function Home() {
       setLocation("/Login");
     }
   }, [token]);
-  const [error, data] = useFetchWithToken<{
+  const [error, data, loading] = useFetchWithToken<{
     status: number;
     result: Array<[string, string]>;
   }>("api/getTableNames");
@@ -47,11 +49,17 @@ export default function Home() {
                 id={id}
               />
             ))
+          ) : loading ? (
+            <>
+              <ProjectCardSkeleton />
+              <ProjectCardSkeleton />
+              <ProjectCardSkeleton />
+            </>
           ) : (
-            <div className="flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <h1 className="text-4xl font-bold">No Projects</h1>
-              <p className="text-gray-500 text-center mt-2">
-                Create a new project to get started!
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <p className="text-xl font-bold">No projects found</p>
+              <p className="text-lg">
+                Add a project to get started with your dashboard
               </p>
             </div>
           )}
