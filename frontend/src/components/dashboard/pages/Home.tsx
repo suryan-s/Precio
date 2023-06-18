@@ -26,7 +26,7 @@ export default function Home() {
     result: Array<[string, string]>;
   }>("api/getTableNames");
   useEffect(() => {
-    if (data) {
+    if (data && data.status === 200) {
       setProjectStore(data);
     }
   }, [data]);
@@ -37,19 +37,20 @@ export default function Home() {
       <div className="flex flex-col p-6 px-6 md:px-12 bg-zinc-100 min-h-[calc(100vh-5rem)]">
         <h1 className="text-4xl font-bold">Projects</h1>
         <div className="mt-8 grid gap-8 grid-automatic">
-          {projectStore ? (
+          {projectStore.result.length > 0 ? (
             projectStore.result.map(([name, id]) => (
               <ProjectCard
                 name={name}
                 status="offline"
                 image={`https://picsum.photos/200?random=${id}`}
                 key={id}
+                id={id}
               />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center w-full">
+            <div className="flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <h1 className="text-4xl font-bold">No Projects</h1>
-              <p className="text-gray-500">
+              <p className="text-gray-500 text-center mt-2">
                 Create a new project to get started!
               </p>
             </div>

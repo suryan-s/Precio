@@ -13,7 +13,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { MoreVerticalIcon, Settings2, Trash } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   AlertDialogHeader,
   AlertDialogFooter,
@@ -26,11 +26,15 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-
+import { Icons } from "@/components/icons";
+import { fetchWithToken } from "@/lib/auth/utils";
+import { useCallback, useState } from "react";
+import { useProjectStore } from "@/lib/stores/projectStore";
 interface ProjectCardProps {
   name: string;
   status: "online" | "offline";
   image: string;
+  id: string;
 }
 /**
  * Project Card Component
@@ -38,7 +42,39 @@ interface ProjectCardProps {
  * @prop `status` Project Status (online/offline)
  * @prop `image` Project Image URL
  */
-const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
+const ProjectCard = ({ name, status, image, id }: ProjectCardProps) => {
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const removeProject = useProjectStore((state) => state.removeProject);
+  const [, setLocation] = useLocation();
+  const deleteHandler = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault();
+      setLoading(true);
+      await fetchWithToken(`api/deleteProject/${id}`, {
+        method: "POST",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === 200) {
+            setOpen(false);
+            removeProject([name, id]);
+          }
+        })
+        .catch((err: Error) => {
+          console.error(err);
+          if (
+            err.message === "Token expired" ||
+            err.message === "No token found"
+          ) {
+            setLocation("/Login");
+          }
+        });
+
+      setLoading(false);
+    },
+    [id, name, removeProject]
+  );
   return (
     <Card className="hover:shadow-lg relative transition-shadow duration-300 ease-in-out">
       <Link href={`/${encodeURIComponent(name)}`}>
@@ -72,7 +108,7 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
           <Button className="gap-2 justify-evenly">
             <Settings2 size={20} /> Project Settings
           </Button>
-          <AlertDialog>
+          <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger
               className={buttonVariants({
                 variant: "destructive",
@@ -94,8 +130,13 @@ const ProjectCard = ({ name, status, image }: ProjectCardProps) => {
               <AlertDialogFooter>
                 <AlertDialogAction
                   className={buttonVariants({ variant: "destructive" })}
+                  onClick={deleteHandler}
                 >
-                  Yes, delete this project
+                  {loading ? (
+                    <Icons.spinner className="animate-spin" />
+                  ) : (
+                    "Delete"
+                  )}
                 </AlertDialogAction>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
               </AlertDialogFooter>
