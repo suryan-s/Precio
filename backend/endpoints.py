@@ -6,6 +6,8 @@ import sqlite3
 
 import pandas as pd
 from dbutils.pooled_db import PooledDB
+from starlette.exceptions import HTTPException
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 # Create a connection pool
 pool = PooledDB(
@@ -700,7 +702,10 @@ async def create_project(config, user_id: str):
     except sqlite3.Error as e:
         print(f"The SQL statement failed with error: {e}")
         status = 500
+        raise HTTPException(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        )
     finally:
         if conn:
             cursor.close()
-    return status
+    return pro_id, status
