@@ -22,7 +22,7 @@ const UserControls = () => {
 };
 const Navbar = () => {
   return (
-    <header>
+    <header className="sticky z-50">
       <nav className="flex items-center justify-between flex-wrap bg-primary p-4 px-6 md:px-12">
         <div className="flex items-center flex-shrink-0 text-white mr-6">
           <Command className="mr-2 h-7 w-7" />

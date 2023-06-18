@@ -54,7 +54,6 @@ const AddNewProject = () => {
   const [loading, setLoading] = useState(false);
   const [selectValue, setSelectValue] = useState<string | undefined>(undefined);
   const [, setLocation] = useLocation();
-  const { setIsOpen } = useTour();
 
   const addProject = useProjectStore((state) => state.addProject);
   const submitHandler = useCallback(
