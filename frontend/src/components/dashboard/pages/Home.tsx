@@ -1,5 +1,5 @@
 import { useLocalStorage } from "usehooks-ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useFetchWithToken } from "@/lib/auth/utils";
 import { useProjectStore } from "@/lib/stores/projectStore";
@@ -9,10 +9,12 @@ import AddProject from "@/components/dashboard/AddProject";
 import ProjectCard, {
   ProjectCardSkeleton,
 } from "@/components/dashboard/ProjectCard";
+import { useTour } from "@reactour/tour";
 
 export default function Home() {
   const [token] = useLocalStorage<string | null>("token", null);
   const [__, setLocation] = useLocation();
+  const { setIsOpen } = useTour();
   const [projectStore, setProjectStore] = useProjectStore((state) => [
     state.projectStore,
     state.setProjectStore,
@@ -31,8 +33,12 @@ export default function Home() {
     if (data && data.status === 200) {
       setProjectStore(data);
     }
+    if (data?.result.length === 0) {
+      setIsOpen(true);
+    }
   }, [data]);
   console.log(error, data);
+
   return (
     <>
       <Navbar />
@@ -56,10 +62,10 @@ export default function Home() {
               <ProjectCardSkeleton />
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <p className="text-xl font-bold">No projects found</p>
+            <div className="absolute flex flex-col items-center justify-center inset-0">
+              <p className="text-2xl font-bold">No projects found!</p>
               <p className="text-lg">
-                Add a project to get started with your dashboard
+                Add a project to get started with your dashboard.
               </p>
             </div>
           )}

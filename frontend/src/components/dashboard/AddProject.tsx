@@ -29,6 +29,7 @@ import { Icons } from "../icons";
 import { fetchWithToken } from "@/lib/auth/utils";
 import { useLocation } from "wouter";
 import { useProjectStore } from "@/lib/stores/projectStore";
+import { useTour } from "@reactour/tour";
 
 const ImportProject = () => {
   return (
@@ -53,6 +54,7 @@ const AddNewProject = () => {
   const [loading, setLoading] = useState(false);
   const [selectValue, setSelectValue] = useState<string | undefined>(undefined);
   const [, setLocation] = useLocation();
+
   const addProject = useProjectStore((state) => state.addProject);
   const submitHandler = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -96,6 +98,7 @@ const AddNewProject = () => {
     },
     [setOpen, setLoading, selectValue]
   );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
@@ -165,11 +168,14 @@ const AddNewProject = () => {
 };
 
 const AddProject = () => {
+  const { setIsOpen } = useTour();
   return (
     <Popover>
       <PopoverTrigger
         title="Add new..."
         className="fixed bg-primary bottom-6 right-6 text-white hover:outline outline-1 rounded-full p-4"
+        id="add-new"
+        onClick={() => setIsOpen(false)}
       >
         <Plus size={25} />
       </PopoverTrigger>
