@@ -18,6 +18,8 @@ Exceptions:
 - HTTPException: Raised when an internal server error occurs.
 
 """
+import asyncio
+
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.security import OAuth2PasswordBearer
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
@@ -32,7 +34,7 @@ from backend.endpoints import (
     get_gauge_data,
     get_line_data,
     get_table_names,
-    predictBasic,
+    predictBasic, update_project,
 )
 from backend.schemas import CreateProject
 
@@ -170,14 +172,47 @@ async def delete_table(project_id: str, token: str = Depends(get_current_token))
     user_id = await get_user_id_from_token(token)
     if user_id is None:
         raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED,
-                detail="Invalid or missing authorization token",
-                headers={"WWW-Authenticate": "Bearer"},
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing authorization token",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     status = await delete_project(project_id, user_id)
     if status == 500:
         raise HTTPException(
-                status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        )
+    return {"status": status}
+
+
+@router.post("/api/updateProject/{project_id}")
+async def delete_table(request: Request, project_id: str, token: str = Depends(get_current_token)):
+    """
+    Updates the details of the project in the database.
+
+    This route handles a POST request to update a project specified by the `project_id`.
+    It calls the `delete_project` function to delete the project table.
+
+    Args:
+        project_id: The API token of the project table to be deleted.
+
+    Returns:
+        A dictionary containing the status of the operation.
+        :param request:
+        :param project_id:
+        :param token:
+    """
+    user_id = await get_user_id_from_token(token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing authorization token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    config = await request.json()
+    status = await update_project(project_id, user_id, config)
+    if status == 500:
+        raise HTTPException(
+            status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
         )
     return {"status": status}
 
@@ -210,6 +245,7 @@ async def get_table(token: str = Depends(get_current_token)):
             status_code=HTTP_404_NOT_FOUND, detail="No projects found"
         )
     else:
+        await asyncio.sleep(1)
         return {"result": result, "status": status}
 
 

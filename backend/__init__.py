@@ -22,6 +22,7 @@ from backend.api import router as api_route
 from backend.auth import router as auth_route
 from backend.pms import router as pms_route
 from backend.wms import router as wms_route
+from backend.endpoints import router as endpoints_route
 
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
@@ -45,6 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(endpoints_route)
 app.include_router(api_route)
 app.include_router(auth_route)
 app.include_router(pms_route)

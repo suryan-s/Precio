@@ -6,6 +6,7 @@ import sqlite3
 
 import pandas as pd
 from dbutils.pooled_db import PooledDB
+from fastapi import APIRouter
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -13,8 +14,20 @@ from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 pool = PooledDB(
     creator=sqlite3,
     database=os.path.join("database", "sql3.db"),
-    maxconnections=100,  # Adjust the maximum number of connections as per your requirements
+    maxconnections=100,
 )
+
+router = APIRouter()
+
+
+@router.on_event("shutdown")
+async def on_shutdown():
+    """
+    Shutdown the db when the server is closed.
+    """
+    await pool.close()
+    print("Closed DB connection pool")
+
 
 columns_WMS = {
     "date_time": "date_time TIMESTAMP",
@@ -115,95 +128,13 @@ async def create_tables():
     cursor.close()
 
 
-async def create_project_(config):
-    """
-    Create a new project table in the database based on the provided configuration.
-
-    Args:
-        config (dict): The configuration dictionary containing project details.
-
-    Returns:
-        int: The status code indicating the result of the operation.
-            - 200: The table was created successfully.
-            - 500: An error occurred while creating the table.
-
-    Raises:
-        sqlite3.Error: If there is an error executing SQL statements.
-
-    """
-    status = 500
-    token = config["id"]
-    print(token)
-    pro_name = config["name"]
-    pro_name = pro_name.replace(" ", "")
-    table_name = str(pro_name) + "_" + str(token)
-    table_name = table_name.replace(" ", "")
-    print(table_name)
-    create_table_sql = """"""
-    if config["available"] == "Weather Station":
-        # Define the SQL statement to create a new table
-        create_table_sql = """CREATE TABLE {} (
-                                date_time TIMESTAMP,
-                                maxtempC INTEGER,
-                                mintempC INTEGER,
-                                uvIndex INTEGER,
-                                DewPointC INTEGER,
-                                FeelsLikeC INTEGER,
-                                HeatIndexC INTEGER,
-                                WindChillC INTEGER,
-                                WindGustKmph INTEGER,
-                                humidity INTEGER,
-                                precipMM INTEGER,
-                                pressure INTEGER,
-                                tempC INTEGER,
-                                visibility INTEGER,
-                                winddirDegree INTEGER,
-                                windspeedKmph INTEGER,
-                                location TEXT
-                            );""".format(
-            table_name
-        )
-    elif config["available"] == "PMS":
-        create_table_sql = """CREATE TABLE {} (
-                                tempC INTEGER,
-                                moisture INTEGER,
-                                location TEXT
-                            );""".format(
-            table_name
-        )
-
-    conn = pool.connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(create_table_sql)
-    except sqlite3.Error as e:
-        print(e)
-
-    # Check if the table was created successfully
-    if f"{table_name}" in [
-        table[0]
-        for table in cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table';"
-        )
-    ]:
-        print("Table created successfully.")
-        status = 200
-        conn.commit()
-    else:
-        print("Error creating table.")
-        status = 500
-
-    if conn:
-        cursor.close()
-    return status
-
-
 async def delete_project(project_id, user_id):
     """
     Deletes a project table from the database and updates the settings file.
 
     Args:
-        project_id (str): The token identifying the project table to delete.
+        :param project_id: The token identifying the project table to delete.
+        :param user_id:
 
     Returns:
         int: The status code indicating the result of the operation.
@@ -213,6 +144,7 @@ async def delete_project(project_id, user_id):
     Raises:
         sqlite3.Error: If there is an error executing the SQL statement.
         Exception: For any other unexpected exceptions.
+
 
     """
     delete_sql = """DELETE FROM projects WHERE project_id = ? AND user_id = ?;"""
@@ -474,6 +406,7 @@ async def get_line_data(token, parameter):
 async def get_table_names(user_id: str):
     """
     Retrieves the names of the projects added into the Projects table.
+    :param user_id: The user ID of the logged-in user
 
     Returns:
         tuple: A tuple containing the following elements:
@@ -555,7 +488,7 @@ def insert_into_table_PMS(token, datapoints):
 
 def load_sql_to_pandas(token: str):
     """
-    Loads data from an SQLite database table into a pandas DataFrame.
+    Loads data from an SQLite database table into a Pandas DataFrame.
 
     Args:
         token (str): The name of the table to load data from.
@@ -595,6 +528,11 @@ def predictBasic():
 
 
 async def get_password(username):
+    """
+    A function to retrieve the password if the username is present in the database.
+    :param username: From the token decrypt
+    :return:
+    """
     conn = pool.connection()
     cursor = conn.cursor()
     result = None
@@ -709,3 +647,28 @@ async def create_project(config, user_id: str):
         if conn:
             cursor.close()
     return pro_id, status
+
+
+async def update_project(pro_id, user_id, config):
+    # config = {
+    #     "project_name": "Home",
+    #     "project_description": "Home weather station",
+    #     "project_type": "Custom",
+    # }
+    update_sql = """ UPDATE projects SET project_name = ?, project_description = ?, project_type = ? WHERE project_id = ? AND user_id = ?"""
+    status = 500
+    values = (config["project_name"], config["project_description"], config["project_type"], pro_id, user_id)
+    conn = pool.connection()
+    cursor = conn.cursor()
+    try:
+        val = cursor.execute(update_sql, values)
+        print("Updated", val)
+        status = 200
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"The SQL statement failed with error: {e}")
+        status = 500
+    finally:
+        if conn:
+            cursor.close()
+        return status
