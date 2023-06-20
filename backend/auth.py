@@ -19,7 +19,6 @@ router = APIRouter()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# SECRET_KEY = secrets.token_hex(32)
 SECRET_KEY = "ThisIsASecretKeyAndShouldBeChangedOnProduction"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -169,11 +168,11 @@ async def register(request: Request, user: User):
     """
 
     try:
-        incomming = await request.json()
+        incoming = await request.json()
         user_id = secrets.token_hex(8)
-        username = incomming["username"]
-        hashed_password = get_password_hash(incomming["password"])
-        email_id = incomming["email"]
+        username = incoming["username"]
+        hashed_password = get_password_hash(incoming["password"])
+        email_id = incoming["email"]
         res = await add_user(user_id, username, hashed_password, email_id)
         # print("add user: ",res)
         if res == 409:
@@ -246,7 +245,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             data={"sub": user_id}, expires_delta=access_token_expires
         )
         # print("userid from token: ", get_user_id_from_token(access_token))
-        print(access_token)
+        # print(access_token)
         return {"access_token": access_token, "token_type": "bearer", "status": 200, "message": "Login successful"}
 
     raise HTTPException(

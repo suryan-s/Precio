@@ -14,9 +14,15 @@ pool = PooledDB(
     maxconnections=100,  # Adjust the maximum number of connections as per your requirements
 )
 
+
 def create_table():
+    """
+    This function creates the database tables if they do not exist.
+    :return:
+    """
     conn = pool.connection()
     cursor = conn.cursor()
+    # Create table for users
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id TEXT PRIMARY KEY,
@@ -25,6 +31,7 @@ def create_table():
             email TEXT
         )
     """)
+    # Create table for projects
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS projects (
             project_id TEXT PRIMARY KEY,
@@ -36,6 +43,7 @@ def create_table():
             FOREIGN KEY (user_id) REFERENCES users(user_id)
         )
     """)
+    # Create table for devices
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS devices (
             device_id TEXT PRIMARY KEY,
@@ -44,9 +52,10 @@ def create_table():
             user_id INTEGER,
             project_id TEXT,
             FOREIGN KEY (user_id) REFERENCES users(user_id),
-            FOREIGN KEY (userproject_id_id) REFERENCES projects(project_id)
+            FOREIGN KEY (project_id) REFERENCES projects(project_id)
         )
     """)
+    # Create table for data handling
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS data (
             device_id TEXT,
@@ -55,9 +64,9 @@ def create_table():
             timestamp TIMESTAMP PRIMARY KEY,
             FOREIGN KEY (device_id) REFERENCES devices(device_id)
         )
-    """ )
+    """)
     conn.commit()
-    cursor.close()    
+    cursor.close()
 
 
 def create_project(config):
@@ -69,23 +78,24 @@ def create_project(config):
     status = 500
     project_id = secrets.token_hex(8)
     project_name = config["name"]
-    project_description = config["description"] if len(config["description"])!=0 else "None"
-    project_type = config["type"] if len(config["type"])!=0 else "None"
+    project_description = config["description"] if len(config["description"]) != 0 else "None"
+    project_type = config["type"] if len(config["type"]) != 0 else "None"
     project_created = datetime.now()
     user_id = "user_id"
-    print(f"Project created: {project_created}, Project name: {project_name}, Project ID: {project_id}, Project type: {project_type}, Project description: {project_description}")
-    create_project_query = """
-        INSERT INTO projects (project_id, project_name, project_created, project_description, project_type, user_id) VALUES (?, ?, ?, ?, ?, ?)
-    """
+    print(
+        f"Project created: {project_created}, Project name: {project_name}, Project ID: {project_id}, Project type: {project_type}, Project description: {project_description}")
+    create_project_query = """INSERT INTO projects (project_id, project_name, project_created, project_description, project_type, user_id) VALUES (?, ?, ?, ?, ?, ?)"""
     conn = pool.connection()
     cursor = conn.cursor()
     try:
-        cursor.execute(create_project_query, (project_id, project_name, project_created, project_description, project_type, user_id))
+        cursor.execute(create_project_query,
+                       (project_id, project_name, project_created, project_description, project_type, user_id)
+                       )
         conn.commit()
         status = 200
     except sqlite3.Error as error:
         print(error)
         status = 500
-    if conn: 
+    if conn:
         cursor.close()
     return status
