@@ -1,5 +1,5 @@
 import { useLocalStorage } from "usehooks-ts";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useFetchWithToken } from "@/lib/auth/utils";
 import { useProjectStore } from "@/lib/stores/projectStore";
